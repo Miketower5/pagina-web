@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clients — BrewStudio</title>
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar">
+    <div id="sidebar-logo">BrewStudio</div>
+    <nav id="sidebar-nav">
+      <a href="dashboard.html" class="nav-link">
+        <svg><!-- icon: grid --></svg>
+        Dashboard
+      </a>
+      <a href="clients.html" class="nav-link active">
+        <svg><!-- icon: users --></svg>
+        Clients
+      </a>
+      <a href="audit-reports.html" class="nav-link">
+        <svg><!-- icon: chart --></svg>
+        Audit Reports
+      </a>
+      <a href="onboarding.html" class="nav-link">
+        <svg><!-- icon: checklist --></svg>
+        Onboarding
+      </a>
+      <a href="services.html" class="nav-link">
+        <svg><!-- icon: briefcase --></svg>
+        Services
+      </a>
+      <a href="pricing.html" class="nav-link">
+        <svg><!-- icon: dollar --></svg>
+        Pricing
+      </a>
+      <a href="settings.html" class="nav-link">
+        <svg><!-- icon: settings --></svg>
+        Settings
+      </a>
+    </nav>
+    <div id="sync-indicator">
+      <span id="sync-dot"></span>
+      <span id="sync-label">Synced</span>
+    </div>
+  </aside>
+
+  <!-- TOPBAR -->
+  <header id="topbar">
+    <button id="hamburger">&#9776;</button>
+    <h1 id="page-title">Clients</h1>
+    <div id="user-avatar">BS</div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main id="main-content">
+
+    <!-- KPI CARDS -->
+    <section id="kpi-grid">
+      <div class="kpi-card">
+        <label>Total Clients</label>
+        <div class="kpi-number" id="kpi-total">0</div>
+      </div>
+      <div class="kpi-card">
+        <label>Active</label>
+        <div class="kpi-number" id="kpi-active">0</div>
+      </div>
+      <div class="kpi-card">
+        <label>Pending</label>
+        <div class="kpi-number" id="kpi-pending">0</div>
+      </div>
+      <div class="kpi-card">
+        <label>Paused</label>
+        <div class="kpi-number" id="kpi-paused">0</div>
+      </div>
+    </section>
+
+    <!-- TOOLBAR -->
+    <div id="toolbar">
+      <input type="text" id="search-input" placeholder="Search by name, city, email…">
+      <div id="filter-tabs">
+        <button class="tab active" data-filter="All">All</button>
+        <button class="tab" data-filter="Active">Active</button>
+        <button class="tab" data-filter="Pending">Pending</button>
+        <button class="tab" data-filter="Paused">Paused</button>
+      </div>
+      <div id="toolbar-actions">
+        <button id="add-client-btn">+ Add Client</button>
+        <button id="export-csv-btn">Export CSV</button>
+      </div>
+    </div>
+
+    <!-- CLIENTS GRID -->
+    <section id="clients-grid">
+      <!-- Rendered by JS -->
+    </section>
+
+  </main>
+
+  <!-- ADD / EDIT CLIENT MODAL -->
+  <div id="modal-overlay" class="hidden">
+    <div id="client-modal">
+      <button id="modal-close">✕</button>
+      <h2 id="modal-title">Add New Client</h2>
+      <form id="client-form">
+        <input type="hidden" id="client-id">
+        <div class="field">
+          <label>Café Name *</label>
+          <input type="text" id="f-name" required>
+        </div>
+        <div class="field">
+          <label>City *</label>
+          <input type="text" id="f-city" required>
+        </div>
+        <div class="field">
+          <label>Instagram Handle</label>
+          <input type="text" id="f-instagram" placeholder="@handle">
+        </div>
+        <div class="field">
+          <label>Contact Email *</label>
+          <input type="email" id="f-email" required>
+        </div>
+        <div class="field">
+          <label>Plan</label>
+          <select id="f-plan">
+            <option value="Starter">Starter</option>
+            <option value="Growth">Growth</option>
+            <option value="Full Brand">Full Brand</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Status</label>
+          <select id="f-status">
+            <option value="Active">Active</option>
+            <option value="Pending">Pending</option>
+            <option value="Paused">Paused</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Notes</label>
+          <textarea id="f-notes" rows="3"></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="button" id="modal-cancel">Cancel</button>
+          <button type="submit" id="modal-save">Save client</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- VIEW CLIENT MODAL -->
+  <div id="view-overlay" class="hidden">
+    <div id="view-modal">
+      <button id="view-close">✕</button>
+      <div id="view-content">
+        <!-- Rendered by JS -->
+      </div>
+      <div class="modal-actions">
+        <button id="view-edit-btn">Edit</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ── localStorage helpers ──────────────────────────────────
+    function getData(key, fallback = []) {
+      try { return JSON.parse(localStorage.getItem('brewstudio_' + key)) || fallback; }
+      catch { return fallback; }
+    }
+    function saveData(key, value) {
+      localStorage.setItem('brewstudio_' + key, JSON.stringify(value));
+      scheduleSync();
+    }
+
+    // ── State ─────────────────────────────────────────────────
+    let currentFilter = 'All';
+    let searchQuery = '';
+
+    // ── KPIs ─────────────────────────────────────────────────
+    function renderKPIs() {
+      const clients = getData('clients');
+      document.getElementById('kpi-total').textContent = clients.length;
+      document.getElementById('kpi-active').textContent = clients.filter(c => c.status === 'Active').length;
+      document.getElementById('kpi-pending').textContent = clients.filter(c => c.status === 'Pending').length;
+      document.getElementById('kpi-paused').textContent = clients.filter(c => c.status === 'Paused').length;
+    }
+
+    // ── Color from name ───────────────────────────────────────
+    function colorFromName(name) {
+      const colors = ['#2E5C7A', '#3D5A3E', '#C8782A', '#C4553A', '#D4A843', '#6B4E8A'];
+      let hash = 0;
+      for (const ch of (name || '')) hash = ch.charCodeAt(0) + ((hash << 5) - hash);
+      return colors[Math.abs(hash) % colors.length];
+    }
+
+    // ── Render grid ───────────────────────────────────────────
+    function renderClients() {
+      let clients = getData('clients');
+      if (currentFilter !== 'All') clients = clients.filter(c => c.status === currentFilter);
+      if (searchQuery) {
+        const q = searchQuery.toLowerCase();
+        clients = clients.filter(c =>
+          (c.name || '').toLowerCase().includes(q) ||
+          (c.city || '').toLowerCase().includes(q) ||
+          (c.email || '').toLowerCase().includes(q)
+        );
+      }
+      const grid = document.getElementById('clients-grid');
+      if (!clients.length) {
+        grid.innerHTML = '<p id="empty-msg">No clients found.</p>';
+        return;
+      }
+      grid.innerHTML = clients.map((c, i) => `
+        <div class="client-card" data-id="${c.id}">
+          <div class="client-stripe" style="background:${colorFromName(c.name)}"></div>
+          <div class="client-body">
+            <h3 class="client-name">${c.name || 'Unnamed'}</h3>
+            <p class="client-meta">${c.city || '—'}</p>
+            <p class="client-meta">${c.instagram || ''}</p>
+            <div class="client-badges">
+              <span class="badge plan-badge">${c.plan || '—'}</span>
+              <span class="badge status-badge status-${(c.status || '').toLowerCase()}">${c.status || '—'}</span>
+            </div>
+            <div class="client-actions">
+              <button class="view-btn" data-id="${c.id}">View details</button>
+              <button class="del-btn" data-id="${c.id}" title="Delete">🗑</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // ── CRUD ──────────────────────────────────────────────────
+    function openAddModal() {
+      document.getElementById('modal-title').textContent = 'Add New Client';
+      document.getElementById('client-form').reset();
+      document.getElementById('client-id').value = '';
+      document.getElementById('modal-overlay').classList.remove('hidden');
+    }
+
+    function openEditModal(client) {
+      document.getElementById('modal-title').textContent = 'Edit Client';
+      document.getElementById('client-id').value = client.id;
+      document.getElementById('f-name').value = client.name || '';
+      document.getElementById('f-city').value = client.city || '';
+      document.getElementById('f-instagram').value = client.instagram || '';
+      document.getElementById('f-email').value = client.email || '';
+      document.getElementById('f-plan').value = client.plan || 'Starter';
+      document.getElementById('f-status').value = client.status || 'Active';
+      document.getElementById('f-notes').value = client.notes || '';
+      document.getElementById('view-overlay').classList.add('hidden');
+      document.getElementById('modal-overlay').classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('modal-overlay').classList.add('hidden');
+    }
+
+    document.getElementById('client-form').addEventListener('submit', e => {
+      e.preventDefault();
+      const clients = getData('clients');
+      const id = document.getElementById('client-id').value;
+      const client = {
+        id: id || Date.now().toString(),
+        name: document.getElementById('f-name').value.trim(),
+        city: document.getElementById('f-city').value.trim(),
+        instagram: document.getElementById('f-instagram').value.trim(),
+        email: document.getElementById('f-email').value.trim(),
+        plan: document.getElementById('f-plan').value,
+        status: document.getElementById('f-status').value,
+        notes: document.getElementById('f-notes').value.trim(),
+        createdAt: id ? (clients.find(c => c.id === id) || {}).createdAt : new Date().toISOString()
+      };
+      if (id) {
+        const idx = clients.findIndex(c => c.id === id);
+        if (idx > -1) clients[idx] = client;
+      } else {
+        clients.push(client);
+      }
+      saveData('clients', clients);
+      closeModal();
+      renderKPIs();
+      renderClients();
+    });
+
+    // ── View modal ────────────────────────────────────────────
+    function openViewModal(client) {
+      document.getElementById('view-content').innerHTML = `
+        <h2>${client.name}</h2>
+        <p><strong>City:</strong> ${client.city || '—'}</p>
+        <p><strong>Instagram:</strong> ${client.instagram || '—'}</p>
+        <p><strong>Email:</strong> ${client.email || '—'}</p>
+        <p><strong>Plan:</strong> ${client.plan || '—'}</p>
+        <p><strong>Status:</strong> ${client.status || '—'}</p>
+        <p><strong>Notes:</strong> ${client.notes || '—'}</p>
+        <p><strong>Added:</strong> ${client.createdAt ? new Date(client.createdAt).toLocaleDateString() : '—'}</p>
+      `;
+      document.getElementById('view-edit-btn').onclick = () => openEditModal(client);
+      document.getElementById('view-overlay').classList.remove('hidden');
+    }
+
+    // ── Event delegation ──────────────────────────────────────
+    document.getElementById('clients-grid').addEventListener('click', e => {
+      const id = e.target.dataset.id;
+      if (!id) return;
+      const clients = getData('clients');
+      const client = clients.find(c => c.id === id);
+      if (e.target.classList.contains('view-btn') && client) openViewModal(client);
+      if (e.target.classList.contains('del-btn')) {
+        if (!confirm(`Delete ${client ? client.name : 'this client'}?`)) return;
+        saveData('clients', clients.filter(c => c.id !== id));
+        renderKPIs();
+        renderClients();
+      }
+    });
+
+    // ── Search & filter ───────────────────────────────────────
+    document.getElementById('search-input').addEventListener('input', e => {
+      searchQuery = e.target.value;
+      renderClients();
+    });
+
+    document.getElementById('filter-tabs').addEventListener('click', e => {
+      if (!e.target.classList.contains('tab')) return;
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      e.target.classList.add('active');
+      currentFilter = e.target.dataset.filter;
+      renderClients();
+    });
+
+    // ── Modal controls ────────────────────────────────────────
+    document.getElementById('add-client-btn').addEventListener('click', openAddModal);
+    document.getElementById('modal-close').addEventListener('click', closeModal);
+    document.getElementById('modal-cancel').addEventListener('click', closeModal);
+    document.getElementById('view-close').addEventListener('click', () =>
+      document.getElementById('view-overlay').classList.add('hidden')
+    );
+    document.getElementById('modal-overlay').addEventListener('click', e => {
+      if (e.target === document.getElementById('modal-overlay')) closeModal();
+    });
+    document.getElementById('view-overlay').addEventListener('click', e => {
+      if (e.target === document.getElementById('view-overlay'))
+        document.getElementById('view-overlay').classList.add('hidden');
+    });
+
+    // ── Export CSV ────────────────────────────────────────────
+    document.getElementById('export-csv-btn').addEventListener('click', () => {
+      const clients = getData('clients');
+      const headers = ['Name', 'City', 'Instagram', 'Email', 'Plan', 'Status', 'Notes', 'Created'];
+      const rows = clients.map(c => [
+        c.name, c.city, c.instagram, c.email, c.plan, c.status, c.notes, c.createdAt
+      ].map(v => `"${(v || '').replace(/"/g, '""')}"`).join(','));
+      const csv = [headers.join(','), ...rows].join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'brewstudio-clients.csv';
+      a.click();
+    });
+
+    // ── Cloud Sync ────────────────────────────────────────────
+    const SYNC_CONFIG = {
+      get binId() { return localStorage.getItem('brewstudio_bin_id'); },
+      get apiKey() { return localStorage.getItem('brewstudio_api_key'); }
+    };
+    const SYNC_KEYS = ['clients', 'tasks', 'audits', 'invoices', 'settings', 'checklist'];
+
+    let syncTimeout;
+    function scheduleSync() {
+      clearTimeout(syncTimeout);
+      syncTimeout = setTimeout(pushToCloud, 2000);
+    }
+
+    function updateSyncStatus(status) {
+      const dot = document.getElementById('sync-dot');
+      const label = document.getElementById('sync-label');
+      const colors = { synced: '#3D5A3E', syncing: '#D4A843', error: '#C4553A' };
+      const labels = { synced: 'Synced', syncing: 'Syncing…', error: 'Offline' };
+      dot.style.backgroundColor = colors[status];
+      label.textContent = labels[status];
+    }
+
+    async function pushToCloud() {
+      if (!SYNC_CONFIG.binId || !SYNC_CONFIG.apiKey) return;
+      updateSyncStatus('syncing');
+      const payload = {};
+      SYNC_KEYS.forEach(k => { payload[k] = getData(k); });
+      try {
+        await fetch(`https://api.jsonbin.io/v3/b/${SYNC_CONFIG.binId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'X-Master-Key': SYNC_CONFIG.apiKey },
+          body: JSON.stringify(payload)
+        });
+        localStorage.setItem('brewstudio_last_sync', Date.now());
+        updateSyncStatus('synced');
+      } catch { updateSyncStatus('error'); }
+    }
+
+    async function pullFromCloud() {
+      if (!SYNC_CONFIG.binId || !SYNC_CONFIG.apiKey) return;
+      updateSyncStatus('syncing');
+      try {
+        const res = await fetch(`https://api.jsonbin.io/v3/b/${SYNC_CONFIG.binId}/latest`, {
+          headers: { 'X-Master-Key': SYNC_CONFIG.apiKey }
+        });
+        const json = await res.json();
+        const data = json.record || {};
+        SYNC_KEYS.forEach(k => { if (data[k]) localStorage.setItem('brewstudio_' + k, JSON.stringify(data[k])); });
+        localStorage.setItem('brewstudio_last_sync', Date.now());
+        updateSyncStatus('synced');
+      } catch { updateSyncStatus('error'); }
+    }
+
+    async function autoSync() {
+      const lastSync = localStorage.getItem('brewstudio_last_sync');
+      if (!lastSync || Date.now() - parseInt(lastSync) > 30 * 60 * 1000) await pullFromCloud();
+    }
+
+    // ── Mobile sidebar ────────────────────────────────────────
+    document.getElementById('hamburger').addEventListener('click', () => {
+      document.getElementById('sidebar').classList.toggle('open');
+    });
+
+    // ── Init ──────────────────────────────────────────────────
+    autoSync().then(() => {
+      renderKPIs();
+      renderClients();
+    });
+  </script>
+
+</body>
+</html>
