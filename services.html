@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Services — BrewStudio</title>
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar">
+    <div id="sidebar-logo">BrewStudio</div>
+    <nav id="sidebar-nav">
+      <a href="dashboard.html" class="nav-link">Dashboard</a>
+      <a href="clients.html" class="nav-link">Clients</a>
+      <a href="audit-reports.html" class="nav-link">Audit Reports</a>
+      <a href="onboarding.html" class="nav-link">Onboarding</a>
+      <a href="services.html" class="nav-link active">Services</a>
+      <a href="pricing.html" class="nav-link">Pricing</a>
+      <a href="settings.html" class="nav-link">Settings</a>
+    </nav>
+    <div id="sync-indicator">
+      <span id="sync-dot"></span>
+      <span id="sync-label">Synced</span>
+    </div>
+  </aside>
+
+  <!-- TOPBAR -->
+  <header id="topbar">
+    <button id="hamburger">&#9776;</button>
+    <h1 id="page-title">Services</h1>
+    <div id="user-avatar">BS</div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main id="main-content">
+
+    <div id="top-actions">
+      <button id="add-service-btn">+ Add Service</button>
+    </div>
+
+    <div id="services-grid">
+      <!-- Rendered by JS -->
+    </div>
+
+  </main>
+
+  <!-- ADD SERVICE MODAL -->
+  <div id="modal-overlay" class="hidden">
+    <div id="service-modal">
+      <button id="modal-close">✕</button>
+      <h2 id="modal-title">Add Service</h2>
+      <form id="service-form">
+        <input type="hidden" id="f-id">
+        <div class="field">
+          <label>Service Name *</label>
+          <input type="text" id="f-name" required>
+        </div>
+        <div class="field">
+          <label>Description *</label>
+          <textarea id="f-desc" rows="3" required></textarea>
+        </div>
+        <div class="field">
+          <label>Category tags (comma-separated)</label>
+          <input type="text" id="f-tags" placeholder="Social, Content, Design">
+        </div>
+        <div class="field">
+          <label>Price (optional)</label>
+          <input type="text" id="f-price" placeholder="e.g. $300/mo">
+        </div>
+        <div class="modal-actions">
+          <button type="button" id="modal-cancel">Cancel</button>
+          <button type="submit">Save service</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // ── Default services ──────────────────────────────────────
+    const DEFAULT_SERVICES = [
+      {
+        id: 'svc-1', name: 'Social Media Management',
+        description: 'Consistent, on-brand posting across Instagram and other platforms. We handle scheduling, captions, and community responses.',
+        tags: ['Social'], price: '$300/mo'
+      },
+      {
+        id: 'svc-2', name: 'Content Creation',
+        description: 'Photography direction, copywriting, and creative assets tailored to your café's character and audience.',
+        tags: ['Content'], price: ''
+      },
+      {
+        id: 'svc-3', name: 'Website Design',
+        description: 'Clean, fast, mobile-first websites that reflect who you are — without unnecessary complexity.',
+        tags: ['Design'], price: ''
+      },
+      {
+        id: 'svc-4', name: 'Brand Identity',
+        description: 'Logo, colour palette, typography, and tone of voice — built to hold together everywhere you show up.',
+        tags: ['Design', 'Strategy'], price: ''
+      },
+      {
+        id: 'svc-5', name: 'Strategy & Consulting',
+        description: 'A clear plan built around your actual goals. Monthly reviews, honest reporting, and no vanity metrics.',
+        tags: ['Strategy'], price: ''
+      },
+      {
+        id: 'svc-6', name: 'Full Brand Package',
+        description: 'Everything we offer, bundled and coordinated. One team, one vision, full accountability.',
+        tags: ['Social', 'Content', 'Design', 'Strategy'], price: '$1,500/mo'
+      }
+    ];
+
+    // ── Helpers ───────────────────────────────────────────────
+    function getData(key, fallback) {
+      try { return JSON.parse(localStorage.getItem('brewstudio_' + key)) ?? fallback; }
+      catch { return fallback; }
+    }
+    function saveData(key, value) {
+      localStorage.setItem('brewstudio_' + key, JSON.stringify(value));
+      scheduleSync();
+    }
+    function getServices() {
+      return getData('services', DEFAULT_SERVICES);
+    }
+
+    // ── Client count per plan ────────────────────────────────
+    function clientsOnPlan(serviceName) {
+      const clients = getData('clients', []);
+      const planMap = {
+        'Social Media Management': ['Starter', 'Growth', 'Full Brand'],
+        'Content Creation': ['Growth', 'Full Brand'],
+        'Website Design': ['Growth', 'Full Brand'],
+        'Brand Identity': ['Full Brand'],
+        'Strategy & Consulting': ['Growth', 'Full Brand'],
+        'Full Brand Package': ['Full Brand']
+      };
+      const plans = planMap[serviceName] || [];
+      return clients.filter(c => plans.includes(c.plan) && c.status === 'Active').length;
+    }
+
+    // ── Render ────────────────────────────────────────────────
+    function renderServices() {
+      const services = getServices();
+      const grid = document.getElementById('services-grid');
+      if (!services.length) {
+        grid.innerHTML = '<p>No services yet.</p>';
+        return;
+      }
+      grid.innerHTML = services.map(s => `
+        <div class="service-card" data-id="${s.id}">
+          <div class="service-body">
+            <h3 class="service-name">${s.name}</h3>
+            <p class="service-desc">${s.description}</p>
+            <div class="service-tags">
+              ${(s.tags || []).map(t => `<span class="tag">${t}</span>`).join('')}
+            </div>
+            ${s.price ? `<p class="service-price">${s.price}</p>` : ''}
+            <p class="service-clients">${clientsOnPlan(s.name)} active client${clientsOnPlan(s.name) !== 1 ? 's' : ''}</p>
+          </div>
+          <div class="service-actions">
+            <button class="edit-btn" data-id="${s.id}">Edit</button>
+            <button class="del-btn" data-id="${s.id}">Delete</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // ── Modal open/close ──────────────────────────────────────
+    function openAddModal() {
+      document.getElementById('modal-title').textContent = 'Add Service';
+      document.getElementById('service-form').reset();
+      document.getElementById('f-id').value = '';
+      document.getElementById('modal-overlay').classList.remove('hidden');
+    }
+
+    function openEditModal(service) {
+      document.getElementById('modal-title').textContent = 'Edit Service';
+      document.getElementById('f-id').value = service.id;
+      document.getElementById('f-name').value = service.name;
+      document.getElementById('f-desc').value = service.description;
+      document.getElementById('f-tags').value = (service.tags || []).join(', ');
+      document.getElementById('f-price').value = service.price || '';
+      document.getElementById('modal-overlay').classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('modal-overlay').classList.add('hidden');
+      document.getElementById('service-form').reset();
+    }
+
+    // ── Save ──────────────────────────────────────────────────
+    document.getElementById('service-form').addEventListener('submit', e => {
+      e.preventDefault();
+      const services = getServices();
+      const id = document.getElementById('f-id').value;
+      const service = {
+        id: id || 'svc-' + Date.now(),
+        name: document.getElementById('f-name').value.trim(),
+        description: document.getElementById('f-desc').value.trim(),
+        tags: document.getElementById('f-tags').value.split(',').map(t => t.trim()).filter(Boolean),
+        price: document.getElementById('f-price').value.trim()
+      };
+      if (id) {
+        const idx = services.findIndex(s => s.id === id);
+        if (idx > -1) services[idx] = service;
+      } else {
+        services.push(service);
+      }
+      saveData('services', services);
+      closeModal();
+      renderServices();
+    });
+
+    // ── Event delegation ──────────────────────────────────────
+    document.getElementById('services-grid').addEventListener('click', e => {
+      const id = e.target.dataset.id;
+      if (!id) return;
+      const services = getServices();
+      const service = services.find(s => s.id === id);
+      if (e.target.classList.contains('edit-btn') && service) openEditModal(service);
+      if (e.target.classList.contains('del-btn')) {
+        if (!confirm(`Delete "${service ? service.name : 'this service'}"?`)) return;
+        saveData('services', services.filter(s => s.id !== id));
+        renderServices();
+      }
+    });
+
+    document.getElementById('add-service-btn').addEventListener('click', openAddModal);
+    document.getElementById('modal-close').addEventListener('click', closeModal);
+    document.getElementById('modal-cancel').addEventListener('click', closeModal);
+    document.getElementById('modal-overlay').addEventListener('click', e => {
+      if (e.target === document.getElementById('modal-overlay')) closeModal();
+    });
+
+    // ── Cloud Sync ────────────────────────────────────────────
+    const SYNC_CONFIG = {
+      get binId() { return localStorage.getItem('brewstudio_bin_id'); },
+      get apiKey() { return localStorage.getItem('brewstudio_api_key'); }
+    };
+    const SYNC_KEYS = ['clients', 'tasks', 'audits', 'invoices', 'settings', 'checklist'];
+
+    let syncTimeout;
+    function scheduleSync() {
+      clearTimeout(syncTimeout);
+      syncTimeout = setTimeout(pushToCloud, 2000);
+    }
+    function updateSyncStatus(status) {
+      const colors = { synced: '#3D5A3E', syncing: '#D4A843', error: '#C4553A' };
+      const labels = { synced: 'Synced', syncing: 'Syncing…', error: 'Offline' };
+      document.getElementById('sync-dot').style.backgroundColor = colors[status];
+      document.getElementById('sync-label').textContent = labels[status];
+    }
+    async function pushToCloud() {
+      if (!SYNC_CONFIG.binId || !SYNC_CONFIG.apiKey) return;
+      updateSyncStatus('syncing');
+      const payload = {};
+      SYNC_KEYS.forEach(k => { payload[k] = getData(k, []); });
+      try {
+        await fetch(`https://api.jsonbin.io/v3/b/${SYNC_CONFIG.binId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'X-Master-Key': SYNC_CONFIG.apiKey },
+          body: JSON.stringify(payload)
+        });
+        localStorage.setItem('brewstudio_last_sync', Date.now());
+        updateSyncStatus('synced');
+      } catch { updateSyncStatus('error'); }
+    }
+    async function pullFromCloud() {
+      if (!SYNC_CONFIG.binId || !SYNC_CONFIG.apiKey) return;
+      updateSyncStatus('syncing');
+      try {
+        const res = await fetch(`https://api.jsonbin.io/v3/b/${SYNC_CONFIG.binId}/latest`, {
+          headers: { 'X-Master-Key': SYNC_CONFIG.apiKey }
+        });
+        const json = await res.json();
+        const data = json.record || {};
+        SYNC_KEYS.forEach(k => { if (data[k] !== undefined) localStorage.setItem('brewstudio_' + k, JSON.stringify(data[k])); });
+        localStorage.setItem('brewstudio_last_sync', Date.now());
+        updateSyncStatus('synced');
+      } catch { updateSyncStatus('error'); }
+    }
+    async function autoSync() {
+      const lastSync = localStorage.getItem('brewstudio_last_sync');
+      if (!lastSync || Date.now() - parseInt(lastSync) > 30 * 60 * 1000) await pullFromCloud();
+    }
+
+    // ── Mobile sidebar ────────────────────────────────────────
+    document.getElementById('hamburger').addEventListener('click', () => {
+      document.getElementById('sidebar').classList.toggle('open');
+    });
+
+    // ── Init ──────────────────────────────────────────────────
+    autoSync().then(() => renderServices());
+  </script>
+
+</body>
+</html>
