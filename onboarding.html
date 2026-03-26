@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Onboarding — BrewStudio</title>
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar">
+    <div id="sidebar-logo">BrewStudio</div>
+    <nav id="sidebar-nav">
+      <a href="dashboard.html" class="nav-link">Dashboard</a>
+      <a href="clients.html" class="nav-link">Clients</a>
+      <a href="audit-reports.html" class="nav-link">Audit Reports</a>
+      <a href="onboarding.html" class="nav-link active">Onboarding</a>
+      <a href="services.html" class="nav-link">Services</a>
+      <a href="pricing.html" class="nav-link">Pricing</a>
+      <a href="settings.html" class="nav-link">Settings</a>
+    </nav>
+    <div id="sync-indicator">
+      <span id="sync-dot"></span>
+      <span id="sync-label">Synced</span>
+    </div>
+  </aside>
+
+  <!-- TOPBAR -->
+  <header id="topbar">
+    <button id="hamburger">&#9776;</button>
+    <h1 id="page-title">Onboarding</h1>
+    <div id="user-avatar">BS</div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main id="main-content">
+
+    <!-- TABS (CSS radio trick) -->
+    <div id="tabs-wrapper">
+      <input type="radio" name="tab" id="tab-captions" checked>
+      <input type="radio" name="tab" id="tab-checklist">
+      <input type="radio" name="tab" id="tab-brand">
+
+      <div id="tab-labels">
+        <label for="tab-captions">Caption Prompts</label>
+        <label for="tab-checklist">Onboarding Checklist</label>
+        <label for="tab-brand">Brand Voice Guide</label>
+      </div>
+
+      <!-- TAB 1: CAPTION PROMPTS -->
+      <div id="panel-captions" class="tab-panel">
+
+        <section class="prompt-section">
+          <h3>Espresso &amp; Coffee</h3>
+          <div class="prompts-grid">
+            <div class="prompt-card">
+              <p>"Three grams less. Thirty seconds longer. Sometimes the best cup of the day starts with a mistake you'd never repeat."</p>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <div class="prompt-card">
+              <p>"This lot was harvested at 1,900 metres in Ethiopia's Gedeo Zone. You'll taste it — bright, clean, a little wild."</p>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <div class="prompt-card">
+              <p>"Filter at 7am. Espresso at noon. Same bean, entirely different conversation."</p>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <div class="prompt-card">
+              <p>"We pull every shot by hand. Not because it's faster — it isn't. Because it keeps us honest."</p>
+              <button class="copy-btn">Copy</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="prompt-section">
+          <h3>Atmosphere &amp; Space</h3>
+          <div class="prompts-grid">
+            <div class="prompt-card">
+              <p>"The corner table by the window has been claimed by the same person every Tuesday for two years. We've never asked why."</p>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <div class="prompt-card">
+              <p>"No music before 10am. Just the grinder, the rain, and whatever you brought with you."</p>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <div class="prompt-card">
+              <p>"We leave the walls bare on purpose. The coffee should be the thing you remember."</p>
+              <button class="copy-btn">Copy</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="prompt-section">
+          <h3>Community &amp; People</h3>
+          <div class="prompts-grid">
+            <div class="prompt-card">
+              <p>"Karin has been our barista for three years. She still tastes every batch before we open."</p>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <div class="prompt-card">
+              <p>"A regular came in yesterday and told us our oat flat white helped him through a hard winter. We don't take that lightly."</p>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <div class="prompt-card">
+              <p>"We visited the farm in May. The people who grow this coffee wake up earlier than we do."</p>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <div class="prompt-card">
+              <p>"This city has given us its mornings for four years. We try to deserve them."</p>
+              <button class="copy-btn">Copy</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="prompt-section">
+          <h3>Seasonal &amp; Events</h3>
+          <div class="prompts-grid">
+            <div class="prompt-card">
+              <p>"October light through the window, a washed natural from Yirgacheffe, and nowhere to be. That's the deal."</p>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <div class="prompt-card">
+              <p>"We're hosting a cupping this Saturday — no experience needed, just curiosity. DM us for a spot."</p>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <div class="prompt-card">
+              <p>"New seasonal menu starts Monday. Slower roasts, warmer notes. More on that soon."</p>
+              <button class="copy-btn">Copy</button>
+            </div>
+          </div>
+        </section>
+
+      </div><!-- /panel-captions -->
+
+      <!-- TAB 2: ONBOARDING CHECKLIST -->
+      <div id="panel-checklist" class="tab-panel">
+
+        <div id="progress-wrap">
+          <div id="progress-label">
+            <span id="progress-count">0 of 12 completed</span>
+          </div>
+          <div id="progress-track">
+            <div id="progress-bar"></div>
+          </div>
+        </div>
+
+        <ul id="checklist">
+          <li class="checklist-item" data-i="0">
+            <input type="checkbox" id="chk-0">
+            <label for="chk-0">Complete brand questionnaire</label>
+          </li>
+          <li class="checklist-item" data-i="1">
+            <input type="checkbox" id="chk-1">
+            <label for="chk-1">Set up Instagram Business account</label>
+          </li>
+          <li class="checklist-item" data-i="2">
+            <input type="checkbox" id="chk-2">
+            <label for="chk-2">Connect Facebook Page</label>
+          </li>
+          <li class="checklist-item" data-i="3">
+            <input type="checkbox" id="chk-3">
+            <label for="chk-3">Define target audience</label>
+          </li>
+          <li class="checklist-item" data-i="4">
+            <input type="checkbox" id="chk-4">
+            <label for="chk-4">Gather 20 high-quality photos</label>
+          </li>
+          <li class="checklist-item" data-i="5">
+            <input type="checkbox" id="chk-5">
+            <label for="chk-5">Write café bio (150 chars)</label>
+          </li>
+          <li class="checklist-item" data-i="6">
+            <input type="checkbox" id="chk-6">
+            <label for="chk-6">Set up Google Business Profile</label>
+          </li>
+          <li class="checklist-item" data-i="7">
+            <input type="checkbox" id="chk-7">
+            <label for="chk-7">Install Linktree or similar</label>
+          </li>
+          <li class="checklist-item" data-i="8">
+            <input type="checkbox" id="chk-8">
+            <label for="chk-8">Review first content calendar</label>
+          </li>
+          <li class="checklist-item" data-i="9">
+            <input type="checkbox" id="chk-9">
+            <label for="chk-9">Approve first 3 posts</label>
+          </li>
+          <li class="checklist-item" data-i="10">
+            <input type="checkbox" id="chk-10">
+            <label for="chk-10">Schedule first week of content</label>
+          </li>
+          <li class="checklist-item" data-i="11">
+            <input type="checkbox" id="chk-11">
+            <label for="chk-11">First check-in call completed</label>
+          </li>
+        </ul>
+
+      </div><!-- /panel-checklist -->
+
+      <!-- TAB 3: BRAND VOICE GUIDE -->
+      <div id="panel-brand" class="tab-panel">
+
+        <div id="voice-grid">
+          <div id="voice-do">
+            <h3>DO</h3>
+            <ul>
+              <li>
+                <strong>Warm</strong>
+                <p>Write like you're talking to someone you already know. Familiar, not formal.</p>
+              </li>
+              <li>
+                <strong>Honest</strong>
+                <p>If a roast didn't land, say so. If something changed, explain it. Trust is built by telling the truth.</p>
+              </li>
+              <li>
+                <strong>Specific</strong>
+                <p>Name the farm, the altitude, the barista. Details make content believable.</p>
+              </li>
+              <li>
+                <strong>Sensory</strong>
+                <p>Describe what coffee tastes, smells, and feels like. Let people imagine being there.</p>
+              </li>
+              <li>
+                <strong>Local</strong>
+                <p>Reference the city, the season, the neighbourhood. Make people feel it's theirs.</p>
+              </li>
+              <li>
+                <strong>Understated</strong>
+                <p>Let the work speak. One quiet sentence beats three enthusiastic ones.</p>
+              </li>
+            </ul>
+          </div>
+
+          <div id="voice-dont">
+            <h3>DON'T</h3>
+            <ul>
+              <li>
+                <strong>Hyperbolic</strong>
+                <p>Never say "best", "incredible", "amazing", or "world-class". They signal the opposite of confidence.</p>
+              </li>
+              <li>
+                <strong>Generic</strong>
+                <p>Avoid "a cup of warmth", "your daily ritual", "crafted with love". These could be anyone's café.</p>
+              </li>
+              <li>
+                <strong>Corporate</strong>
+                <p>No mission statements. No "we are committed to". Write like a person, not a press release.</p>
+              </li>
+              <li>
+                <strong>Filtered / Fake</strong>
+                <p>Don't pretend every cup is perfect or every morning is beautiful. Real is more interesting.</p>
+              </li>
+              <li>
+                <strong>Trend-chasing</strong>
+                <p>Skip the trending audio, the dancing reels, the viral formats that have nothing to do with coffee.</p>
+              </li>
+              <li>
+                <strong>Pushy</strong>
+                <p>Don't tell people to "like and subscribe", "drop a comment below", or "tag a friend". Let them choose.</p>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+      </div><!-- /panel-brand -->
+
+    </div><!-- /tabs-wrapper -->
+  </main>
+
+  <script>
+    // ── Helpers ───────────────────────────────────────────────
+    function getData(key, fallback) {
+      try { return JSON.parse(localStorage.getItem('brewstudio_' + key)) ?? fallback; }
+      catch { return fallback; }
+    }
+    function saveData(key, value) {
+      localStorage.setItem('brewstudio_' + key, JSON.stringify(value));
+      scheduleSync();
+    }
+
+    // ── Copy buttons ──────────────────────────────────────────
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const text = btn.previousElementSibling.textContent.trim();
+        navigator.clipboard.writeText(text).then(() => {
+          const orig = btn.textContent;
+          btn.textContent = 'Copied!';
+          setTimeout(() => { btn.textContent = orig; }, 1500);
+        });
+      });
+    });
+
+    // ── Checklist ─────────────────────────────────────────────
+    function loadChecklist() {
+      const state = getData('checklist', new Array(12).fill(false));
+      document.querySelectorAll('.checklist-item').forEach(item => {
+        const i = parseInt(item.dataset.i);
+        const chk = item.querySelector('input[type="checkbox"]');
+        chk.checked = !!state[i];
+        item.classList.toggle('done', !!state[i]);
+      });
+      updateProgress(state);
+    }
+
+    function updateProgress(state) {
+      const done = state.filter(Boolean).length;
+      const pct = Math.round((done / 12) * 100);
+      document.getElementById('progress-count').textContent = `${done} of 12 completed`;
+      document.getElementById('progress-bar').style.width = pct + '%';
+    }
+
+    document.getElementById('checklist').addEventListener('change', e => {
+      if (e.target.type !== 'checkbox') return;
+      const state = getData('checklist', new Array(12).fill(false));
+      const i = parseInt(e.target.closest('.checklist-item').dataset.i);
+      state[i] = e.target.checked;
+      e.target.closest('.checklist-item').classList.toggle('done', e.target.checked);
+      saveData('checklist', state);
+      updateProgress(state);
+    });
+
+    // ── Cloud Sync ────────────────────────────────────────────
+    const SYNC_CONFIG = {
+      get binId() { return localStorage.getItem('brewstudio_bin_id'); },
+      get apiKey() { return localStorage.getItem('brewstudio_api_key'); }
+    };
+    const SYNC_KEYS = ['clients', 'tasks', 'audits', 'invoices', 'settings', 'checklist'];
+
+    let syncTimeout;
+    function scheduleSync() {
+      clearTimeout(syncTimeout);
+      syncTimeout = setTimeout(pushToCloud, 2000);
+    }
+    function updateSyncStatus(status) {
+      const colors = { synced: '#3D5A3E', syncing: '#D4A843', error: '#C4553A' };
+      const labels = { synced: 'Synced', syncing: 'Syncing…', error: 'Offline' };
+      document.getElementById('sync-dot').style.backgroundColor = colors[status];
+      document.getElementById('sync-label').textContent = labels[status];
+    }
+    async function pushToCloud() {
+      if (!SYNC_CONFIG.binId || !SYNC_CONFIG.apiKey) return;
+      updateSyncStatus('syncing');
+      const payload = {};
+      SYNC_KEYS.forEach(k => { payload[k] = getData(k, []); });
+      try {
+        await fetch(`https://api.jsonbin.io/v3/b/${SYNC_CONFIG.binId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'X-Master-Key': SYNC_CONFIG.apiKey },
+          body: JSON.stringify(payload)
+        });
+        localStorage.setItem('brewstudio_last_sync', Date.now());
+        updateSyncStatus('synced');
+      } catch { updateSyncStatus('error'); }
+    }
+    async function pullFromCloud() {
+      if (!SYNC_CONFIG.binId || !SYNC_CONFIG.apiKey) return;
+      updateSyncStatus('syncing');
+      try {
+        const res = await fetch(`https://api.jsonbin.io/v3/b/${SYNC_CONFIG.binId}/latest`, {
+          headers: { 'X-Master-Key': SYNC_CONFIG.apiKey }
+        });
+        const json = await res.json();
+        const data = json.record || {};
+        SYNC_KEYS.forEach(k => { if (data[k] !== undefined) localStorage.setItem('brewstudio_' + k, JSON.stringify(data[k])); });
+        localStorage.setItem('brewstudio_last_sync', Date.now());
+        updateSyncStatus('synced');
+      } catch { updateSyncStatus('error'); }
+    }
+    async function autoSync() {
+      const lastSync = localStorage.getItem('brewstudio_last_sync');
+      if (!lastSync || Date.now() - parseInt(lastSync) > 30 * 60 * 1000) await pullFromCloud();
+    }
+
+    // ── Mobile sidebar ────────────────────────────────────────
+    document.getElementById('hamburger').addEventListener('click', () => {
+      document.getElementById('sidebar').classList.toggle('open');
+    });
+
+    // ── Init ──────────────────────────────────────────────────
+    autoSync().then(() => loadChecklist());
+  </script>
+
+</body>
+</html>

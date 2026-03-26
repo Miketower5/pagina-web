@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pricing — BrewStudio</title>
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar">
+    <div id="sidebar-logo">BrewStudio</div>
+    <nav id="sidebar-nav">
+      <a href="dashboard.html" class="nav-link">Dashboard</a>
+      <a href="clients.html" class="nav-link">Clients</a>
+      <a href="audit-reports.html" class="nav-link">Audit Reports</a>
+      <a href="onboarding.html" class="nav-link">Onboarding</a>
+      <a href="services.html" class="nav-link">Services</a>
+      <a href="pricing.html" class="nav-link active">Pricing</a>
+      <a href="settings.html" class="nav-link">Settings</a>
+    </nav>
+    <div id="sync-indicator">
+      <span id="sync-dot"></span>
+      <span id="sync-label">Synced</span>
+    </div>
+  </aside>
+
+  <!-- TOPBAR -->
+  <header id="topbar">
+    <button id="hamburger">&#9776;</button>
+    <h1 id="page-title">Pricing</h1>
+    <div id="user-avatar">BS</div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main id="main-content">
+
+    <!-- KPI CARDS -->
+    <section id="kpi-grid">
+      <div class="kpi-card">
+        <label>MRR</label>
+        <div class="kpi-number" id="kpi-mrr">$0</div>
+      </div>
+      <div class="kpi-card">
+        <label>ARR</label>
+        <div class="kpi-number" id="kpi-arr">$0</div>
+      </div>
+      <div class="kpi-card">
+        <label>Avg. per Client</label>
+        <div class="kpi-number" id="kpi-avg">$0</div>
+      </div>
+      <div class="kpi-card">
+        <label>Total Collected</label>
+        <div class="kpi-number" id="kpi-total">$0</div>
+      </div>
+    </section>
+
+    <!-- PLAN BREAKDOWN -->
+    <section id="plan-breakdown">
+      <h2>Plan breakdown</h2>
+      <div id="plan-cards">
+        <div class="plan-stat-card" id="plan-starter">
+          <h3>Starter</h3>
+          <div class="plan-count" id="count-starter">0 clients</div>
+          <div class="plan-bar-track"><div class="plan-bar-fill" id="bar-starter"></div></div>
+          <div class="plan-pct" id="pct-starter">0%</div>
+          <div class="plan-revenue" id="rev-starter">$0</div>
+        </div>
+        <div class="plan-stat-card" id="plan-growth">
+          <h3>Growth</h3>
+          <div class="plan-count" id="count-growth">0 clients</div>
+          <div class="plan-bar-track"><div class="plan-bar-fill" id="bar-growth"></div></div>
+          <div class="plan-pct" id="pct-growth">0%</div>
+          <div class="plan-revenue" id="rev-growth">$0</div>
+        </div>
+        <div class="plan-stat-card" id="plan-full">
+          <h3>Full Brand</h3>
+          <div class="plan-count" id="count-full">0 clients</div>
+          <div class="plan-bar-track"><div class="plan-bar-fill" id="bar-full"></div></div>
+          <div class="plan-pct" id="pct-full">0%</div>
+          <div class="plan-revenue" id="rev-full">$0</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- INVOICE LOG -->
+    <section id="invoice-section">
+      <div id="invoice-header">
+        <h2>Invoice log</h2>
+        <div id="invoice-controls">
+          <select id="status-filter">
+            <option value="All">All statuses</option>
+            <option value="Paid">Paid</option>
+            <option value="Pending">Pending</option>
+            <option value="Overdue">Overdue</option>
+          </select>
+          <button id="new-payment-btn">+ New Payment</button>
+        </div>
+      </div>
+
+      <table id="invoice-table">
+        <thead>
+          <tr>
+            <th data-col="clientName">Client</th>
+            <th data-col="amount">Amount</th>
+            <th data-col="plan">Plan</th>
+            <th data-col="date">Date</th>
+            <th data-col="status">Status</th>
+          </tr>
+        </thead>
+        <tbody id="invoice-tbody">
+          <!-- Rendered by JS -->
+        </tbody>
+      </table>
+    </section>
+
+  </main>
+
+  <!-- NEW PAYMENT MODAL -->
+  <div id="modal-overlay" class="hidden">
+    <div id="payment-modal">
+      <button id="modal-close">✕</button>
+      <h2>New Payment</h2>
+      <form id="payment-form">
+        <div class="field">
+          <label>Client *</label>
+          <select id="f-client" required>
+            <option value="">Select a client…</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Amount ($) *</label>
+          <input type="number" id="f-amount" min="0" required>
+        </div>
+        <div class="field">
+          <label>Plan</label>
+          <select id="f-plan">
+            <option value="Starter">Starter</option>
+            <option value="Growth">Growth</option>
+            <option value="Full Brand">Full Brand</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Date *</label>
+          <input type="date" id="f-date" required>
+        </div>
+        <div class="field">
+          <label>Status</label>
+          <select id="f-status">
+            <option value="Paid">Paid</option>
+            <option value="Pending">Pending</option>
+            <option value="Overdue">Overdue</option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button type="button" id="modal-cancel">Cancel</button>
+          <button type="submit">Save payment</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // ── Helpers ───────────────────────────────────────────────
+    function getData(key, fallback = []) {
+      try { return JSON.parse(localStorage.getItem('brewstudio_' + key)) || fallback; }
+      catch { return fallback; }
+    }
+    function saveData(key, value) {
+      localStorage.setItem('brewstudio_' + key, JSON.stringify(value));
+      scheduleSync();
+    }
+
+    const PLAN_PRICES = { Starter: 300, Growth: 700, 'Full Brand': 1500 };
+
+    // ── KPIs ─────────────────────────────────────────────────
+    function renderKPIs() {
+      const invoices = getData('invoices');
+      const clients = getData('clients');
+      const active = clients.filter(c => c.status === 'Active');
+
+      const now = new Date();
+      const mrr = invoices
+        .filter(i => {
+          const d = new Date(i.date);
+          return i.status === 'Paid' && d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+        })
+        .reduce((s, i) => s + Number(i.amount || 0), 0);
+
+      const arr = mrr * 12;
+      const avg = active.length ? Math.round(mrr / active.length) : 0;
+      const total = invoices.filter(i => i.status === 'Paid').reduce((s, i) => s + Number(i.amount || 0), 0);
+
+      document.getElementById('kpi-mrr').textContent = '$' + mrr.toLocaleString();
+      document.getElementById('kpi-arr').textContent = '$' + arr.toLocaleString();
+      document.getElementById('kpi-avg').textContent = '$' + avg.toLocaleString();
+      document.getElementById('kpi-total').textContent = '$' + total.toLocaleString();
+    }
+
+    // ── Plan breakdown ────────────────────────────────────────
+    function renderPlanBreakdown() {
+      const clients = getData('clients');
+      const invoices = getData('invoices');
+      const plans = ['Starter', 'Growth', 'Full Brand'];
+      const total = clients.length || 1;
+
+      plans.forEach(plan => {
+        const key = plan === 'Full Brand' ? 'full' : plan.toLowerCase();
+        const count = clients.filter(c => c.plan === plan).length;
+        const pct = Math.round((count / total) * 100);
+        const rev = invoices
+          .filter(i => i.plan === plan && i.status === 'Paid')
+          .reduce((s, i) => s + Number(i.amount || 0), 0);
+
+        document.getElementById(`count-${key}`).textContent = `${count} client${count !== 1 ? 's' : ''}`;
+        document.getElementById(`pct-${key}`).textContent = pct + '%';
+        document.getElementById(`rev-${key}`).textContent = '$' + rev.toLocaleString();
+        const bar = document.getElementById(`bar-${key}`);
+        bar.style.width = '0%';
+        setTimeout(() => { bar.style.transition = 'width 0.5s ease'; bar.style.width = pct + '%'; }, 50);
+      });
+    }
+
+    // ── Invoice table ─────────────────────────────────────────
+    let sortCol = 'date', sortAsc = false, filterStatus = 'All';
+
+    function renderInvoices() {
+      let invoices = getData('invoices');
+      if (filterStatus !== 'All') invoices = invoices.filter(i => i.status === filterStatus);
+      invoices.sort((a, b) => {
+        const va = String(a[sortCol] || ''), vb = String(b[sortCol] || '');
+        return sortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+      });
+      const tbody = document.getElementById('invoice-tbody');
+      if (!invoices.length) {
+        tbody.innerHTML = '<tr><td colspan="5">No invoices yet.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = invoices.map(inv => `
+        <tr>
+          <td>${inv.clientName || '—'}</td>
+          <td>$${Number(inv.amount || 0).toLocaleString()}</td>
+          <td>${inv.plan || '—'}</td>
+          <td>${inv.date || '—'}</td>
+          <td><span class="status-badge status-${(inv.status || '').toLowerCase()}">${inv.status || '—'}</span></td>
+        </tr>
+      `).join('');
+    }
+
+    document.querySelectorAll('#invoice-table th').forEach(th => {
+      th.style.cursor = 'pointer';
+      th.addEventListener('click', () => {
+        const col = th.dataset.col;
+        if (sortCol === col) sortAsc = !sortAsc;
+        else { sortCol = col; sortAsc = true; }
+        renderInvoices();
+      });
+    });
+
+    document.getElementById('status-filter').addEventListener('change', e => {
+      filterStatus = e.target.value;
+      renderInvoices();
+    });
+
+    // ── Modal ─────────────────────────────────────────────────
+    function openModal() {
+      const clients = getData('clients');
+      const sel = document.getElementById('f-client');
+      sel.innerHTML = '<option value="">Select a client…</option>' +
+        clients.map(c => `<option value="${c.id}" data-name="${c.name}" data-plan="${c.plan}">${c.name}</option>`).join('');
+      document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
+      document.getElementById('modal-overlay').classList.remove('hidden');
+    }
+    function closeModal() {
+      document.getElementById('modal-overlay').classList.add('hidden');
+      document.getElementById('payment-form').reset();
+    }
+
+    // Auto-fill plan and amount when client is selected
+    document.getElementById('f-client').addEventListener('change', e => {
+      const opt = e.target.options[e.target.selectedIndex];
+      const plan = opt.dataset.plan || '';
+      if (plan) {
+        document.getElementById('f-plan').value = plan;
+        document.getElementById('f-amount').value = PLAN_PRICES[plan] || '';
+      }
+    });
+
+    document.getElementById('new-payment-btn').addEventListener('click', openModal);
+    document.getElementById('modal-close').addEventListener('click', closeModal);
+    document.getElementById('modal-cancel').addEventListener('click', closeModal);
+    document.getElementById('modal-overlay').addEventListener('click', e => {
+      if (e.target === document.getElementById('modal-overlay')) closeModal();
+    });
+
+    document.getElementById('payment-form').addEventListener('submit', e => {
+      e.preventDefault();
+      const clientSel = document.getElementById('f-client');
+      const clientName = clientSel.options[clientSel.selectedIndex]?.dataset.name || '—';
+      const invoice = {
+        id: Date.now().toString(),
+        clientId: clientSel.value,
+        clientName,
+        amount: document.getElementById('f-amount').value,
+        plan: document.getElementById('f-plan').value,
+        date: document.getElementById('f-date').value,
+        status: document.getElementById('f-status').value
+      };
+      const invoices = getData('invoices');
+      invoices.push(invoice);
+      saveData('invoices', invoices);
+      closeModal();
+      renderKPIs();
+      renderPlanBreakdown();
+      renderInvoices();
+    });
+
+    // ── Cloud Sync ────────────────────────────────────────────
+    const SYNC_CONFIG = {
+      get binId() { return localStorage.getItem('brewstudio_bin_id'); },
+      get apiKey() { return localStorage.getItem('brewstudio_api_key'); }
+    };
+    const SYNC_KEYS = ['clients', 'tasks', 'audits', 'invoices', 'settings', 'checklist'];
+
+    let syncTimeout;
+    function scheduleSync() {
+      clearTimeout(syncTimeout);
+      syncTimeout = setTimeout(pushToCloud, 2000);
+    }
+    function updateSyncStatus(status) {
+      const colors = { synced: '#3D5A3E', syncing: '#D4A843', error: '#C4553A' };
+      const labels = { synced: 'Synced', syncing: 'Syncing…', error: 'Offline' };
+      document.getElementById('sync-dot').style.backgroundColor = colors[status];
+      document.getElementById('sync-label').textContent = labels[status];
+    }
+    async function pushToCloud() {
+      if (!SYNC_CONFIG.binId || !SYNC_CONFIG.apiKey) return;
+      updateSyncStatus('syncing');
+      const payload = {};
+      SYNC_KEYS.forEach(k => { payload[k] = getData(k); });
+      try {
+        await fetch(`https://api.jsonbin.io/v3/b/${SYNC_CONFIG.binId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'X-Master-Key': SYNC_CONFIG.apiKey },
+          body: JSON.stringify(payload)
+        });
+        localStorage.setItem('brewstudio_last_sync', Date.now());
+        updateSyncStatus('synced');
+      } catch { updateSyncStatus('error'); }
+    }
+    async function pullFromCloud() {
+      if (!SYNC_CONFIG.binId || !SYNC_CONFIG.apiKey) return;
+      updateSyncStatus('syncing');
+      try {
+        const res = await fetch(`https://api.jsonbin.io/v3/b/${SYNC_CONFIG.binId}/latest`, {
+          headers: { 'X-Master-Key': SYNC_CONFIG.apiKey }
+        });
+        const json = await res.json();
+        const data = json.record || {};
+        SYNC_KEYS.forEach(k => { if (data[k] !== undefined) localStorage.setItem('brewstudio_' + k, JSON.stringify(data[k])); });
+        localStorage.setItem('brewstudio_last_sync', Date.now());
+        updateSyncStatus('synced');
+      } catch { updateSyncStatus('error'); }
+    }
+    async function autoSync() {
+      const lastSync = localStorage.getItem('brewstudio_last_sync');
+      if (!lastSync || Date.now() - parseInt(lastSync) > 30 * 60 * 1000) await pullFromCloud();
+    }
+
+    // ── Mobile sidebar ────────────────────────────────────────
+    document.getElementById('hamburger').addEventListener('click', () => {
+      document.getElementById('sidebar').classList.toggle('open');
+    });
+
+    // ── Init ──────────────────────────────────────────────────
+    autoSync().then(() => {
+      renderKPIs();
+      renderPlanBreakdown();
+      renderInvoices();
+    });
+  </script>
+
+</body>
+</html>
