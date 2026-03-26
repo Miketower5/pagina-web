@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — BrewStudio</title>
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar">
+    <div id="sidebar-logo">BrewStudio</div>
+    <nav id="sidebar-nav">
+      <a href="dashboard.html" class="nav-link active">
+        <svg><!-- icon: grid --></svg>
+        Dashboard
+      </a>
+      <a href="clients.html" class="nav-link">
+        <svg><!-- icon: users --></svg>
+        Clients
+      </a>
+      <a href="audit-reports.html" class="nav-link">
+        <svg><!-- icon: chart --></svg>
+        Audit Reports
+      </a>
+      <a href="onboarding.html" class="nav-link">
+        <svg><!-- icon: checklist --></svg>
+        Onboarding
+      </a>
+      <a href="services.html" class="nav-link">
+        <svg><!-- icon: briefcase --></svg>
+        Services
+      </a>
+      <a href="pricing.html" class="nav-link">
+        <svg><!-- icon: dollar --></svg>
+        Pricing
+      </a>
+      <a href="settings.html" class="nav-link">
+        <svg><!-- icon: settings --></svg>
+        Settings
+      </a>
+    </nav>
+    <div id="sync-indicator">
+      <span id="sync-dot"></span>
+      <span id="sync-label">Synced</span>
+    </div>
+  </aside>
+
+  <!-- TOPBAR -->
+  <header id="topbar">
+    <button id="hamburger">&#9776;</button>
+    <h1 id="page-title">Dashboard</h1>
+    <div id="user-avatar">BS</div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main id="main-content">
+
+    <!-- WELCOME BAR -->
+    <div id="welcome-bar">
+      <div>
+        <h2 id="greeting">Good morning, BrewStudio</h2>
+        <p id="current-date"></p>
+      </div>
+      <div id="welcome-stats">
+        <div class="welcome-stat">
+          <span id="stat-clients">0</span>
+          <label>Active clients</label>
+        </div>
+        <div class="welcome-stat">
+          <span id="stat-mrr">$0</span>
+          <label>MRR</label>
+        </div>
+        <div class="welcome-stat">
+          <span id="stat-audits">0</span>
+          <label>Open audits</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- KPI CARDS -->
+    <section id="kpi-grid">
+      <div class="kpi-card">
+        <label>Active Clients</label>
+        <div class="kpi-number" id="kpi-clients">0</div>
+        <div class="kpi-delta positive">+2 this month</div>
+      </div>
+      <div class="kpi-card">
+        <label>Monthly Revenue (MRR)</label>
+        <div class="kpi-number" id="kpi-mrr">$0</div>
+        <div class="kpi-delta positive">+$700</div>
+      </div>
+      <div class="kpi-card">
+        <label>Open Audits</label>
+        <div class="kpi-number" id="kpi-audits">0</div>
+        <div class="kpi-delta neutral">No change</div>
+      </div>
+      <div class="kpi-card">
+        <label>Avg. Growth</label>
+        <div class="kpi-number" id="kpi-growth">0%</div>
+        <div class="kpi-delta positive">+4%</div>
+      </div>
+    </section>
+
+    <!-- QUICK ACCESS -->
+    <section id="quick-access">
+      <h2>Quick access</h2>
+      <div id="quick-grid">
+        <a href="clients.html" class="quick-card">
+          <svg><!-- icon: users --></svg>
+          <span>Clients</span>
+        </a>
+        <a href="audit-reports.html" class="quick-card">
+          <svg><!-- icon: chart --></svg>
+          <span>Audit Reports</span>
+        </a>
+        <a href="onboarding.html" class="quick-card">
+          <svg><!-- icon: checklist --></svg>
+          <span>Onboarding</span>
+        </a>
+        <a href="services.html" class="quick-card">
+          <svg><!-- icon: briefcase --></svg>
+          <span>Services</span>
+        </a>
+        <a href="pricing.html" class="quick-card">
+          <svg><!-- icon: dollar --></svg>
+          <span>Pricing</span>
+        </a>
+        <a href="settings.html" class="quick-card">
+          <svg><!-- icon: settings --></svg>
+          <span>Settings</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- REVENUE CHART -->
+    <section id="revenue-section">
+      <h2>Revenue — last 6 months</h2>
+      <div id="chart-container">
+        <svg id="revenue-chart" viewBox="0 0 600 200">
+          <!-- Y axis labels -->
+          <text x="0" y="20" class="chart-label">$5k</text>
+          <text x="0" y="70" class="chart-label">$3k</text>
+          <text x="0" y="120" class="chart-label">$1k</text>
+          <!-- Bars rendered by JS -->
+          <g id="chart-bars"></g>
+          <!-- X axis labels -->
+          <g id="chart-months"></g>
+        </svg>
+      </div>
+    </section>
+
+    <!-- BOTTOM ROW -->
+    <div id="bottom-row">
+
+      <!-- TASK LIST -->
+      <section id="tasks-section">
+        <h2>Tasks</h2>
+        <div id="task-input-row">
+          <input type="text" id="task-input" placeholder="Add a task…">
+          <button id="task-add-btn">Add</button>
+        </div>
+        <ul id="task-list">
+          <!-- Tasks rendered by JS -->
+        </ul>
+      </section>
+
+      <!-- RECENT CLIENTS -->
+      <section id="recent-clients-section">
+        <h2>Recent clients</h2>
+        <ul id="recent-clients-list">
+          <!-- Rendered by JS -->
+        </ul>
+        <a href="clients.html" id="view-all-link">View all →</a>
+      </section>
+
+    </div>
+
+    <!-- SOCIAL PERFORMANCE TABLE -->
+    <section id="performance-section">
+      <h2>Social media performance</h2>
+      <table id="performance-table">
+        <thead>
+          <tr>
+            <th data-col="client">Client</th>
+            <th data-col="platform">Platform</th>
+            <th data-col="followers">Followers</th>
+            <th data-col="posts">Posts/Month</th>
+            <th data-col="engagement">Avg. Engagement</th>
+          </tr>
+        </thead>
+        <tbody id="performance-tbody">
+          <!-- Rendered by JS -->
+        </tbody>
+      </table>
+    </section>
+
+  </main>
+
+  <script>
+    // ── Greeting ──────────────────────────────────────────────
+    (function setGreeting() {
+      const hour = new Date().getHours();
+      const greet = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+      document.getElementById('greeting').textContent = `${greet}, BrewStudio`;
+      document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-GB', {
+        weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+      });
+    })();
+
+    // ── localStorage helpers ──────────────────────────────────
+    function getData(key, fallback = []) {
+      try { return JSON.parse(localStorage.getItem('brewstudio_' + key)) || fallback; }
+      catch { return fallback; }
+    }
+    function saveData(key, value) {
+      localStorage.setItem('brewstudio_' + key, JSON.stringify(value));
+      scheduleSync();
+    }
+
+    // ── KPIs ─────────────────────────────────────────────────
+    function renderKPIs() {
+      const clients = getData('clients');
+      const invoices = getData('invoices');
+      const audits = getData('audits');
+
+      const active = clients.filter(c => c.status === 'Active').length;
+      const mrr = invoices
+        .filter(i => i.status === 'Paid' && isThisMonth(i.date))
+        .reduce((sum, i) => sum + Number(i.amount || 0), 0);
+      const openAudits = audits.filter(a => a.status === 'Draft').length;
+
+      document.getElementById('kpi-clients').textContent = active;
+      document.getElementById('kpi-mrr').textContent = '$' + mrr.toLocaleString();
+      document.getElementById('kpi-audits').textContent = openAudits;
+      document.getElementById('stat-clients').textContent = active;
+      document.getElementById('stat-mrr').textContent = '$' + mrr.toLocaleString();
+      document.getElementById('stat-audits').textContent = openAudits;
+    }
+
+    function isThisMonth(dateStr) {
+      const d = new Date(dateStr), now = new Date();
+      return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+    }
+
+    // ── Revenue chart (SVG) ───────────────────────────────────
+    function renderChart() {
+      const invoices = getData('invoices');
+      const months = [];
+      for (let i = 5; i >= 0; i--) {
+        const d = new Date();
+        d.setMonth(d.getMonth() - i);
+        months.push({ label: d.toLocaleString('en', { month: 'short' }), year: d.getFullYear(), month: d.getMonth() });
+      }
+      const totals = months.map(m =>
+        invoices.filter(inv => {
+          const d = new Date(inv.date);
+          return d.getMonth() === m.month && d.getFullYear() === m.year && inv.status === 'Paid';
+        }).reduce((s, inv) => s + Number(inv.amount || 0), 0)
+      );
+      const max = Math.max(...totals, 1000);
+      const barsEl = document.getElementById('chart-bars');
+      const monthsEl = document.getElementById('chart-months');
+      const barW = 60, gap = 40, startX = 50, chartH = 150;
+      barsEl.innerHTML = '';
+      monthsEl.innerHTML = '';
+      totals.forEach((val, i) => {
+        const h = Math.max((val / max) * chartH, 4);
+        const x = startX + i * (barW + gap);
+        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        rect.setAttribute('x', x);
+        rect.setAttribute('y', chartH - h + 10);
+        rect.setAttribute('width', barW);
+        rect.setAttribute('height', h);
+        rect.setAttribute('fill', '#C8782A');
+        rect.setAttribute('rx', '4');
+        barsEl.appendChild(rect);
+        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        text.setAttribute('x', x + barW / 2);
+        text.setAttribute('y', 175);
+        text.setAttribute('text-anchor', 'middle');
+        text.setAttribute('class', 'chart-label');
+        text.textContent = months[i].label;
+        monthsEl.appendChild(text);
+      });
+    }
+
+    // ── Tasks ─────────────────────────────────────────────────
+    function renderTasks() {
+      const tasks = getData('tasks');
+      const list = document.getElementById('task-list');
+      list.innerHTML = '';
+      tasks.forEach((task, i) => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <input type="checkbox" ${task.done ? 'checked' : ''} data-i="${i}">
+          <span style="${task.done ? 'text-decoration:line-through;opacity:.5' : ''}">${task.text}</span>
+          <button data-del="${i}">✕</button>
+        `;
+        list.appendChild(li);
+      });
+    }
+
+    document.getElementById('task-add-btn').addEventListener('click', () => {
+      const input = document.getElementById('task-input');
+      const text = input.value.trim();
+      if (!text) return;
+      const tasks = getData('tasks');
+      tasks.push({ text, done: false });
+      saveData('tasks', tasks);
+      input.value = '';
+      renderTasks();
+    });
+
+    document.getElementById('task-list').addEventListener('click', e => {
+      const tasks = getData('tasks');
+      if (e.target.dataset.del !== undefined) {
+        tasks.splice(Number(e.target.dataset.del), 1);
+      } else if (e.target.type === 'checkbox') {
+        tasks[Number(e.target.dataset.i)].done = e.target.checked;
+      }
+      saveData('tasks', tasks);
+      renderTasks();
+    });
+
+    // ── Recent clients ────────────────────────────────────────
+    function renderRecentClients() {
+      const clients = getData('clients').slice(-5).reverse();
+      const list = document.getElementById('recent-clients-list');
+      list.innerHTML = '';
+      if (!clients.length) {
+        list.innerHTML = '<li>No clients yet.</li>';
+        return;
+      }
+      clients.forEach(c => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <strong>${c.name}</strong>
+          <span>${c.city}</span>
+          <span>${c.plan}</span>
+          <span class="status-badge status-${(c.status || '').toLowerCase()}">${c.status}</span>
+        `;
+        list.appendChild(li);
+      });
+    }
+
+    // ── Performance table ─────────────────────────────────────
+    function renderPerformance() {
+      const clients = getData('clients');
+      const tbody = document.getElementById('performance-tbody');
+      tbody.innerHTML = '';
+      if (!clients.length) {
+        tbody.innerHTML = '<tr><td colspan="5">No data yet.</td></tr>';
+        return;
+      }
+      clients.forEach(c => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${c.name || '—'}</td>
+          <td>Instagram</td>
+          <td>${c.followers || '—'}</td>
+          <td>${c.postsPerMonth || '—'}</td>
+          <td>${c.engagement || '—'}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Table sort
+    document.querySelectorAll('#performance-table th').forEach(th => {
+      th.style.cursor = 'pointer';
+      th.addEventListener('click', () => {
+        const col = th.dataset.col;
+        const clients = getData('clients').sort((a, b) =>
+          String(a[col] || '').localeCompare(String(b[col] || ''))
+        );
+        saveData('clients', clients);
+        renderPerformance();
+      });
+    });
+
+    // ── Cloud Sync ────────────────────────────────────────────
+    const SYNC_CONFIG = {
+      get binId() { return localStorage.getItem('brewstudio_bin_id'); },
+      get apiKey() { return localStorage.getItem('brewstudio_api_key'); }
+    };
+    const SYNC_KEYS = ['clients', 'tasks', 'audits', 'invoices', 'settings', 'checklist'];
+
+    let syncTimeout;
+    function scheduleSync() {
+      clearTimeout(syncTimeout);
+      syncTimeout = setTimeout(pushToCloud, 2000);
+    }
+
+    function updateSyncStatus(status) {
+      const dot = document.getElementById('sync-dot');
+      const label = document.getElementById('sync-label');
+      const colors = { synced: '#3D5A3E', syncing: '#D4A843', error: '#C4553A' };
+      const labels = { synced: 'Synced', syncing: 'Syncing…', error: 'Offline' };
+      dot.style.backgroundColor = colors[status] || colors.synced;
+      label.textContent = labels[status] || 'Synced';
+    }
+
+    async function pushToCloud() {
+      if (!SYNC_CONFIG.binId || !SYNC_CONFIG.apiKey) return;
+      updateSyncStatus('syncing');
+      const payload = {};
+      SYNC_KEYS.forEach(k => { payload[k] = getData(k); });
+      try {
+        await fetch(`https://api.jsonbin.io/v3/b/${SYNC_CONFIG.binId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'X-Master-Key': SYNC_CONFIG.apiKey },
+          body: JSON.stringify(payload)
+        });
+        localStorage.setItem('brewstudio_last_sync', Date.now());
+        updateSyncStatus('synced');
+      } catch { updateSyncStatus('error'); }
+    }
+
+    async function pullFromCloud() {
+      if (!SYNC_CONFIG.binId || !SYNC_CONFIG.apiKey) return;
+      updateSyncStatus('syncing');
+      try {
+        const res = await fetch(`https://api.jsonbin.io/v3/b/${SYNC_CONFIG.binId}/latest`, {
+          headers: { 'X-Master-Key': SYNC_CONFIG.apiKey }
+        });
+        const json = await res.json();
+        const data = json.record || {};
+        SYNC_KEYS.forEach(k => { if (data[k]) localStorage.setItem('brewstudio_' + k, JSON.stringify(data[k])); });
+        localStorage.setItem('brewstudio_last_sync', Date.now());
+        updateSyncStatus('synced');
+      } catch { updateSyncStatus('error'); }
+    }
+
+    async function autoSync() {
+      const lastSync = localStorage.getItem('brewstudio_last_sync');
+      const thirtyMin = 30 * 60 * 1000;
+      if (!lastSync || Date.now() - parseInt(lastSync) > thirtyMin) await pullFromCloud();
+    }
+
+    // ── Mobile sidebar ────────────────────────────────────────
+    document.getElementById('hamburger').addEventListener('click', () => {
+      document.getElementById('sidebar').classList.toggle('open');
+    });
+
+    // ── Init ──────────────────────────────────────────────────
+    autoSync().then(() => {
+      renderKPIs();
+      renderChart();
+      renderTasks();
+      renderRecentClients();
+      renderPerformance();
+    });
+  </script>
+
+</body>
+</html>
