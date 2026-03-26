@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings — BrewStudio</title>
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar">
+    <div id="sidebar-logo">BrewStudio</div>
+    <nav id="sidebar-nav">
+      <a href="dashboard.html" class="nav-link">Dashboard</a>
+      <a href="clients.html" class="nav-link">Clients</a>
+      <a href="audit-reports.html" class="nav-link">Audit Reports</a>
+      <a href="onboarding.html" class="nav-link">Onboarding</a>
+      <a href="services.html" class="nav-link">Services</a>
+      <a href="pricing.html" class="nav-link">Pricing</a>
+      <a href="settings.html" class="nav-link active">Settings</a>
+    </nav>
+    <div id="sync-indicator">
+      <span id="sync-dot"></span>
+      <span id="sync-label">Synced</span>
+    </div>
+  </aside>
+
+  <!-- TOPBAR -->
+  <header id="topbar">
+    <button id="hamburger">&#9776;</button>
+    <h1 id="page-title">Settings</h1>
+    <div id="user-avatar">BS</div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main id="main-content">
+
+    <!-- BUSINESS INFO -->
+    <section class="settings-section">
+      <h2>Business information</h2>
+      <form id="business-form">
+        <div class="field">
+          <label>Agency Name</label>
+          <input type="text" id="s-name" placeholder="BrewStudio">
+        </div>
+        <div class="field">
+          <label>Contact Email</label>
+          <input type="email" id="s-email" placeholder="hei@brewstudio.no">
+        </div>
+        <div class="field">
+          <label>Phone</label>
+          <input type="tel" id="s-phone" placeholder="+47 000 00 000">
+        </div>
+        <div class="field">
+          <label>Website</label>
+          <input type="url" id="s-website" placeholder="https://brewstudio.no">
+        </div>
+        <div class="field">
+          <label>Description</label>
+          <textarea id="s-description" rows="3" placeholder="Specialty coffee marketing agency based in Norway."></textarea>
+        </div>
+        <button type="submit" id="save-business-btn">Save changes</button>
+        <span id="save-confirm" class="hidden">Saved.</span>
+      </form>
+    </section>
+
+    <!-- CLOUD SYNC -->
+    <section class="settings-section">
+      <h2>Cloud sync — JSONBin.io</h2>
+
+      <div id="sync-setup">
+
+        <div class="sync-step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <strong>Create a free account</strong>
+            <p>No credit card required.</p>
+            <a href="https://jsonbin.io" target="_blank" rel="noopener">Open JSONBin.io →</a>
+          </div>
+        </div>
+
+        <div class="sync-step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <strong>Paste your Master Key</strong>
+            <p>Found under Account → API Keys in JSONBin.</p>
+            <input type="password" id="api-key-input" placeholder="$2b$10$…">
+          </div>
+        </div>
+
+        <div class="sync-step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <strong>Initialise bin</strong>
+            <p>Creates a new bin and links it to this app.</p>
+            <button id="init-bin-btn">Initialize Bin</button>
+          </div>
+        </div>
+
+        <div id="sync-status-panel">
+          <span id="conn-dot"></span>
+          <span id="conn-label">Not configured</span>
+        </div>
+
+      </div>
+
+      <div id="sync-actions">
+        <h3>Data management</h3>
+        <div id="sync-buttons">
+          <button id="push-now-btn">Push now</button>
+          <button id="export-json-btn">Export JSON</button>
+          <button id="clear-data-btn">Clear local data</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- EXTERNAL TOOLS -->
+    <section class="settings-section">
+      <h2>External tools</h2>
+      <ul id="tools-list">
+        <li>
+          <strong>Canva</strong>
+          <span>Design templates and brand assets</span>
+          <a href="https://canva.com" target="_blank" rel="noopener">Open →</a>
+        </li>
+        <li>
+          <strong>Later</strong>
+          <span>Social media scheduling</span>
+          <a href="https://later.com" target="_blank" rel="noopener">Open →</a>
+        </li>
+        <li>
+          <strong>Google Analytics</strong>
+          <span>Website traffic and performance</span>
+          <a href="https://analytics.google.com" target="_blank" rel="noopener">Open →</a>
+        </li>
+        <li>
+          <strong>Mailchimp</strong>
+          <span>Email marketing</span>
+          <a href="https://mailchimp.com" target="_blank" rel="noopener">Open →</a>
+        </li>
+        <li>
+          <strong>Notion</strong>
+          <span>Docs, wikis, and project tracking</span>
+          <a href="https://notion.so" target="_blank" rel="noopener">Open →</a>
+        </li>
+      </ul>
+    </section>
+
+    <!-- EMAIL TEMPLATES -->
+    <section class="settings-section">
+      <h2>Email templates</h2>
+      <div id="email-templates">
+
+        <div class="email-template">
+          <div class="email-header">
+            <h3>Welcome email</h3>
+            <button class="copy-email-btn">Copy</button>
+          </div>
+          <pre class="email-body">Subject: Welcome to BrewStudio — here's what happens next
+
+Hi [Name],
+
+We're glad you're here.
+
+Over the next few days, we'll review your current online presence and come back to you with a short audit — where things stand, what's working, and where there's room to improve.
+
+No jargon, no long reports. Just what's relevant.
+
+Our first call is scheduled for [Date]. In the meantime, if you have photos, brand materials, or anything you'd like us to look at, feel free to send them through.
+
+Talk soon,
+BrewStudio
+hei@brewstudio.no</pre>
+        </div>
+
+        <div class="email-template">
+          <div class="email-header">
+            <h3>Monthly report</h3>
+            <button class="copy-email-btn">Copy</button>
+          </div>
+          <pre class="email-body">Subject: [Café Name] — Monthly report, [Month Year]
+
+Hi [Name],
+
+Here's a summary of [Month]:
+
+REACH
+- Followers: [X] (+[Y] from last month)
+- Impressions: [X]
+- Profile visits: [X]
+
+CONTENT
+- Posts published: [X]
+- Best performing post: [Description] ([X] reach)
+- Avg. engagement rate: [X]%
+
+NOTES
+[2–3 sentences on what worked, what we'll adjust next month]
+
+NEXT MONTH
+- [Focus area 1]
+- [Focus area 2]
+
+As always, let us know if you have questions.
+
+BrewStudio
+hei@brewstudio.no</pre>
+        </div>
+
+        <div class="email-template">
+          <div class="email-header">
+            <h3>Audit delivery</h3>
+            <button class="copy-email-btn">Copy</button>
+          </div>
+          <pre class="email-body">Subject: Your Instagram audit — [Café Name]
+
+Hi [Name],
+
+Your audit is ready. Here's the short version:
+
+OVERALL SCORE: [X]/100
+
+STRENGTHS
+- [What's working well]
+- [Another strength]
+
+AREAS TO IMPROVE
+- [Priority 1]
+- [Priority 2]
+- [Priority 3]
+
+The full report is attached. We've kept it to one page — everything you need to act on, nothing you don't.
+
+If you'd like to talk through any of it, we're available for a call this week.
+
+BrewStudio
+hei@brewstudio.no</pre>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // ── Helpers ───────────────────────────────────────────────
+    function getData(key, fallback = {}) {
+      try { return JSON.parse(localStorage.getItem('brewstudio_' + key)) || fallback; }
+      catch { return fallback; }
+    }
+    function saveData(key, value) {
+      localStorage.setItem('brewstudio_' + key, JSON.stringify(value));
+      scheduleSync();
+    }
+
+    // ── Business form ─────────────────────────────────────────
+    function loadBusinessInfo() {
+      const s = getData('settings', {});
+      document.getElementById('s-name').value = s.name || '';
+      document.getElementById('s-email').value = s.email || '';
+      document.getElementById('s-phone').value = s.phone || '';
+      document.getElementById('s-website').value = s.website || '';
+      document.getElementById('s-description').value = s.description || '';
+    }
+
+    document.getElementById('business-form').addEventListener('submit', e => {
+      e.preventDefault();
+      saveData('settings', {
+        name: document.getElementById('s-name').value.trim(),
+        email: document.getElementById('s-email').value.trim(),
+        phone: document.getElementById('s-phone').value.trim(),
+        website: document.getElementById('s-website').value.trim(),
+        description: document.getElementById('s-description').value.trim()
+      });
+      const confirm = document.getElementById('save-confirm');
+      confirm.classList.remove('hidden');
+      setTimeout(() => confirm.classList.add('hidden'), 2000);
+    });
+
+    // ── Sync status panel ─────────────────────────────────────
+    function updateConnStatus() {
+      const binId = localStorage.getItem('brewstudio_bin_id');
+      const apiKey = localStorage.getItem('brewstudio_api_key');
+      const dot = document.getElementById('conn-dot');
+      const label = document.getElementById('conn-label');
+      if (binId && apiKey) {
+        dot.style.backgroundColor = '#3D5A3E';
+        label.textContent = 'Connected ✓';
+        document.getElementById('api-key-input').value = apiKey;
+      } else {
+        dot.style.backgroundColor = '#C4553A';
+        label.textContent = 'Not configured';
+      }
+    }
+
+    // ── Initialize bin ────────────────────────────────────────
+    document.getElementById('init-bin-btn').addEventListener('click', async () => {
+      const key = document.getElementById('api-key-input').value.trim();
+      if (!key) { alert('Paste your Master Key first.'); return; }
+      const btn = document.getElementById('init-bin-btn');
+      btn.textContent = 'Creating…';
+      btn.disabled = true;
+      try {
+        const res = await fetch('https://api.jsonbin.io/v3/b', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Master-Key': key,
+            'X-Bin-Name': 'brewstudio-data',
+            'X-Bin-Private': 'true'
+          },
+          body: JSON.stringify({ initialized: true })
+        });
+        const json = await res.json();
+        const binId = json.metadata?.id;
+        if (!binId) throw new Error('No bin ID returned');
+        localStorage.setItem('brewstudio_api_key', key);
+        localStorage.setItem('brewstudio_bin_id', binId);
+        updateConnStatus();
+        btn.textContent = 'Done!';
+        setTimeout(() => { btn.textContent = 'Initialize Bin'; btn.disabled = false; }, 2000);
+      } catch (err) {
+        alert('Could not create bin. Check your API key and try again.');
+        btn.textContent = 'Initialize Bin';
+        btn.disabled = false;
+      }
+    });
+
+    // ── Push now ──────────────────────────────────────────────
+    document.getElementById('push-now-btn').addEventListener('click', () => pushToCloud());
+
+    // ── Export JSON ───────────────────────────────────────────
+    document.getElementById('export-json-btn').addEventListener('click', () => {
+      const SYNC_KEYS = ['clients', 'tasks', 'audits', 'invoices', 'settings', 'checklist'];
+      const payload = {};
+      SYNC_KEYS.forEach(k => { payload[k] = getData(k, []); });
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'brewstudio-data.json';
+      a.click();
+    });
+
+    // ── Clear local data ──────────────────────────────────────
+    document.getElementById('clear-data-btn').addEventListener('click', () => {
+      if (!confirm('Are you sure? This cannot be undone. All local data will be erased.')) return;
+      const keysToKeep = ['brewstudio_bin_id', 'brewstudio_api_key'];
+      const saved = {};
+      keysToKeep.forEach(k => { saved[k] = localStorage.getItem(k); });
+      localStorage.clear();
+      keysToKeep.forEach(k => { if (saved[k]) localStorage.setItem(k, saved[k]); });
+      loadBusinessInfo();
+      updateConnStatus();
+    });
+
+    // ── Copy email templates ──────────────────────────────────
+    document.querySelectorAll('.copy-email-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const text = btn.closest('.email-template').querySelector('.email-body').textContent;
+        navigator.clipboard.writeText(text).then(() => {
+          const orig = btn.textContent;
+          btn.textContent = 'Copied!';
+          setTimeout(() => { btn.textContent = orig; }, 1500);
+        });
+      });
+    });
+
+    // ── Cloud Sync ────────────────────────────────────────────
+    const SYNC_CONFIG = {
+      get binId() { return localStorage.getItem('brewstudio_bin_id'); },
+      get apiKey() { return localStorage.getItem('brewstudio_api_key'); }
+    };
+    const SYNC_KEYS = ['clients', 'tasks', 'audits', 'invoices', 'settings', 'checklist'];
+
+    let syncTimeout;
+    function scheduleSync() {
+      clearTimeout(syncTimeout);
+      syncTimeout = setTimeout(pushToCloud, 2000);
+    }
+    function updateSyncStatus(status) {
+      const colors = { synced: '#3D5A3E', syncing: '#D4A843', error: '#C4553A' };
+      const labels = { synced: 'Synced', syncing: 'Syncing…', error: 'Offline' };
+      document.getElementById('sync-dot').style.backgroundColor = colors[status];
+      document.getElementById('sync-label').textContent = labels[status];
+    }
+    async function pushToCloud() {
+      if (!SYNC_CONFIG.binId || !SYNC_CONFIG.apiKey) return;
+      updateSyncStatus('syncing');
+      const payload = {};
+      SYNC_KEYS.forEach(k => { payload[k] = getData(k, []); });
+      try {
+        await fetch(`https://api.jsonbin.io/v3/b/${SYNC_CONFIG.binId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'X-Master-Key': SYNC_CONFIG.apiKey },
+          body: JSON.stringify(payload)
+        });
+        localStorage.setItem('brewstudio_last_sync', Date.now());
+        updateSyncStatus('synced');
+      } catch { updateSyncStatus('error'); }
+    }
+    async function pullFromCloud() {
+      if (!SYNC_CONFIG.binId || !SYNC_CONFIG.apiKey) return;
+      updateSyncStatus('syncing');
+      try {
+        const res = await fetch(`https://api.jsonbin.io/v3/b/${SYNC_CONFIG.binId}/latest`, {
+          headers: { 'X-Master-Key': SYNC_CONFIG.apiKey }
+        });
+        const json = await res.json();
+        const data = json.record || {};
+        SYNC_KEYS.forEach(k => { if (data[k] !== undefined) localStorage.setItem('brewstudio_' + k, JSON.stringify(data[k])); });
+        localStorage.setItem('brewstudio_last_sync', Date.now());
+        updateSyncStatus('synced');
+      } catch { updateSyncStatus('error'); }
+    }
+    async function autoSync() {
+      const lastSync = localStorage.getItem('brewstudio_last_sync');
+      if (!lastSync || Date.now() - parseInt(lastSync) > 30 * 60 * 1000) await pullFromCloud();
+    }
+
+    // ── Mobile sidebar ────────────────────────────────────────
+    document.getElementById('hamburger').addEventListener('click', () => {
+      document.getElementById('sidebar').classList.toggle('open');
+    });
+
+    // ── Init ──────────────────────────────────────────────────
+    autoSync().then(() => {
+      loadBusinessInfo();
+      updateConnStatus();
+    });
+  </script>
+
+</body>
+</html>
