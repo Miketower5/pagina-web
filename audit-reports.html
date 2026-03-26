@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audit Reports — BrewStudio</title>
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar">
+    <div id="sidebar-logo">BrewStudio</div>
+    <nav id="sidebar-nav">
+      <a href="dashboard.html" class="nav-link">Dashboard</a>
+      <a href="clients.html" class="nav-link">Clients</a>
+      <a href="audit-reports.html" class="nav-link active">Audit Reports</a>
+      <a href="onboarding.html" class="nav-link">Onboarding</a>
+      <a href="services.html" class="nav-link">Services</a>
+      <a href="pricing.html" class="nav-link">Pricing</a>
+      <a href="settings.html" class="nav-link">Settings</a>
+    </nav>
+    <div id="sync-indicator">
+      <span id="sync-dot"></span>
+      <span id="sync-label">Synced</span>
+    </div>
+  </aside>
+
+  <!-- TOPBAR -->
+  <header id="topbar">
+    <button id="hamburger">&#9776;</button>
+    <h1 id="page-title">Audit Reports</h1>
+    <div id="user-avatar">BS</div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main id="main-content">
+
+    <div id="top-actions">
+      <button id="new-audit-btn">+ New Audit</button>
+    </div>
+
+    <div id="audit-layout">
+
+      <!-- LEFT: list of audits -->
+      <section id="audit-list-section">
+        <h2>All audits</h2>
+        <div id="audit-list">
+          <!-- Rendered by JS -->
+        </div>
+      </section>
+
+      <!-- RIGHT: audit detail -->
+      <section id="audit-detail-section">
+        <div id="audit-placeholder">
+          <p>Select an audit to view details.</p>
+        </div>
+
+        <div id="audit-detail" class="hidden">
+
+          <!-- Score ring -->
+          <div id="score-ring-wrap">
+            <svg id="score-svg" viewBox="0 0 120 120" width="160" height="160">
+              <circle cx="60" cy="60" r="50" fill="none" stroke="#eee" stroke-width="10"/>
+              <circle id="score-arc" cx="60" cy="60" r="50" fill="none" stroke-width="10"
+                stroke-dasharray="314" stroke-dashoffset="314"
+                stroke-linecap="round"
+                transform="rotate(-90 60 60)"/>
+            </svg>
+            <div id="score-number">0<span>/100</span></div>
+          </div>
+
+          <h3 id="detail-client-name"></h3>
+          <p id="detail-date"></p>
+          <span id="detail-status-badge" class="badge"></span>
+
+          <!-- Metric bars -->
+          <div id="metric-bars">
+            <div class="metric-row">
+              <span class="metric-label">Posting Consistency</span>
+              <div class="bar-track"><div class="bar-fill" id="bar-posting"></div></div>
+              <span class="metric-val" id="val-posting">0</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-label">Content Quality</span>
+              <div class="bar-track"><div class="bar-fill" id="bar-content"></div></div>
+              <span class="metric-val" id="val-content">0</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-label">Profile Optimisation</span>
+              <div class="bar-track"><div class="bar-fill" id="bar-profile"></div></div>
+              <span class="metric-val" id="val-profile">0</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-label">Engagement Rate</span>
+              <div class="bar-track"><div class="bar-fill" id="bar-engagement"></div></div>
+              <span class="metric-val" id="val-engagement">0</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-label">Hashtag Strategy</span>
+              <div class="bar-track"><div class="bar-fill" id="bar-hashtag"></div></div>
+              <span class="metric-val" id="val-hashtag">0</span>
+            </div>
+          </div>
+
+          <div id="detail-recommendations">
+            <h4>Recommendations</h4>
+            <p id="recommendations-text"></p>
+          </div>
+
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- NEW AUDIT MODAL -->
+  <div id="modal-overlay" class="hidden">
+    <div id="audit-modal">
+      <button id="modal-close">✕</button>
+      <h2>New Audit</h2>
+      <form id="audit-form">
+        <div class="field">
+          <label>Client *</label>
+          <select id="f-client" required>
+            <option value="">Select a client…</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Date *</label>
+          <input type="date" id="f-date" required>
+        </div>
+
+        <div class="field">
+          <label>Posting Consistency — <span id="lbl-posting">50</span></label>
+          <input type="range" id="s-posting" min="0" max="100" value="50" data-label="lbl-posting">
+        </div>
+        <div class="field">
+          <label>Content Quality — <span id="lbl-content">50</span></label>
+          <input type="range" id="s-content" min="0" max="100" value="50" data-label="lbl-content">
+        </div>
+        <div class="field">
+          <label>Profile Optimisation — <span id="lbl-profile">50</span></label>
+          <input type="range" id="s-profile" min="0" max="100" value="50" data-label="lbl-profile">
+        </div>
+        <div class="field">
+          <label>Engagement Rate — <span id="lbl-engagement">50</span></label>
+          <input type="range" id="s-engagement" min="0" max="100" value="50" data-label="lbl-engagement">
+        </div>
+        <div class="field">
+          <label>Hashtag Strategy — <span id="lbl-hashtag">50</span></label>
+          <input type="range" id="s-hashtag" min="0" max="100" value="50" data-label="lbl-hashtag">
+        </div>
+
+        <div class="field">
+          <label>Total Score</label>
+          <div id="live-score">50 / 100</div>
+        </div>
+
+        <div class="field">
+          <label>Recommendations</label>
+          <textarea id="f-recommendations" rows="4"></textarea>
+        </div>
+
+        <div class="field">
+          <label>Status</label>
+          <select id="f-status">
+            <option value="Draft">Draft</option>
+            <option value="Sent">Sent</option>
+            <option value="Archived">Archived</option>
+          </select>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" id="modal-cancel">Cancel</button>
+          <button type="submit">Save audit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // ── Helpers ───────────────────────────────────────────────
+    function getData(key, fallback = []) {
+      try { return JSON.parse(localStorage.getItem('brewstudio_' + key)) || fallback; }
+      catch { return fallback; }
+    }
+    function saveData(key, value) {
+      localStorage.setItem('brewstudio_' + key, JSON.stringify(value));
+      scheduleSync();
+    }
+
+    // ── Render audit list ─────────────────────────────────────
+    function renderAuditList() {
+      const audits = getData('audits');
+      const list = document.getElementById('audit-list');
+      if (!audits.length) {
+        list.innerHTML = '<p>No audits yet. Create one above.</p>';
+        return;
+      }
+      list.innerHTML = audits.map(a => `
+        <div class="audit-card" data-id="${a.id}">
+          <div class="audit-card-top">
+            <strong>${a.clientName || '—'}</strong>
+            <span class="badge status-${(a.status || '').toLowerCase()}">${a.status || 'Draft'}</span>
+          </div>
+          <div class="audit-card-meta">
+            <span>${a.date || '—'}</span>
+            <span class="audit-score-pill score-${scoreClass(a.score)}">${a.score || 0}/100</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function scoreClass(score) {
+      if (score >= 70) return 'good';
+      if (score >= 45) return 'mid';
+      return 'bad';
+    }
+
+    // ── Show audit detail ─────────────────────────────────────
+    function showDetail(audit) {
+      document.getElementById('audit-placeholder').classList.add('hidden');
+      document.getElementById('audit-detail').classList.remove('hidden');
+
+      document.getElementById('detail-client-name').textContent = audit.clientName || '—';
+      document.getElementById('detail-date').textContent = audit.date || '—';
+      const badge = document.getElementById('detail-status-badge');
+      badge.textContent = audit.status || 'Draft';
+      badge.className = `badge status-${(audit.status || '').toLowerCase()}`;
+      document.getElementById('recommendations-text').textContent = audit.recommendations || '—';
+
+      // Score ring animation
+      const score = audit.score || 0;
+      document.getElementById('score-number').innerHTML = `${score}<span>/100</span>`;
+      const circumference = 314;
+      const offset = circumference - (score / 100) * circumference;
+      const arc = document.getElementById('score-arc');
+      arc.setAttribute('stroke-dashoffset', circumference);
+      const ringColor = score >= 70 ? '#3D5A3E' : score >= 45 ? '#C8782A' : '#C4553A';
+      arc.setAttribute('stroke', ringColor);
+      requestAnimationFrame(() => {
+        arc.style.transition = 'stroke-dashoffset 0.8s ease';
+        arc.setAttribute('stroke-dashoffset', offset);
+      });
+
+      // Metric bars
+      const metrics = [
+        { id: 'posting', val: audit.posting || 0 },
+        { id: 'content', val: audit.content || 0 },
+        { id: 'profile', val: audit.profile || 0 },
+        { id: 'engagement', val: audit.engagement || 0 },
+        { id: 'hashtag', val: audit.hashtag || 0 },
+      ];
+      metrics.forEach(m => {
+        const bar = document.getElementById('bar-' + m.id);
+        const valEl = document.getElementById('val-' + m.id);
+        bar.style.width = '0%';
+        valEl.textContent = m.val;
+        const barColor = m.val >= 70 ? '#3D5A3E' : m.val >= 45 ? '#C8782A' : '#C4553A';
+        bar.style.backgroundColor = barColor;
+        setTimeout(() => { bar.style.transition = 'width 0.6s ease'; bar.style.width = m.val + '%'; }, 50);
+      });
+    }
+
+    // ── Event delegation on audit list ───────────────────────
+    document.getElementById('audit-list').addEventListener('click', e => {
+      const card = e.target.closest('.audit-card');
+      if (!card) return;
+      document.querySelectorAll('.audit-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      const audit = getData('audits').find(a => a.id === card.dataset.id);
+      if (audit) showDetail(audit);
+    });
+
+    // ── Modal ─────────────────────────────────────────────────
+    function openModal() {
+      // Populate client dropdown
+      const clients = getData('clients');
+      const sel = document.getElementById('f-client');
+      sel.innerHTML = '<option value="">Select a client…</option>' +
+        clients.map(c => `<option value="${c.id}" data-name="${c.name}">${c.name}</option>`).join('');
+      document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
+      document.getElementById('modal-overlay').classList.remove('hidden');
+      updateLiveScore();
+    }
+    function closeModal() {
+      document.getElementById('modal-overlay').classList.add('hidden');
+      document.getElementById('audit-form').reset();
+    }
+
+    document.getElementById('new-audit-btn').addEventListener('click', openModal);
+    document.getElementById('modal-close').addEventListener('click', closeModal);
+    document.getElementById('modal-cancel').addEventListener('click', closeModal);
+    document.getElementById('modal-overlay').addEventListener('click', e => {
+      if (e.target === document.getElementById('modal-overlay')) closeModal();
+    });
+
+    // ── Live score calculation ────────────────────────────────
+    function updateLiveScore() {
+      const vals = ['s-posting', 's-content', 's-profile', 's-engagement', 's-hashtag']
+        .map(id => parseInt(document.getElementById(id).value));
+      const avg = Math.round(vals.reduce((a, b) => a + b, 0) / vals.length);
+      document.getElementById('live-score').textContent = `${avg} / 100`;
+    }
+
+    document.querySelectorAll('input[type="range"]').forEach(slider => {
+      slider.addEventListener('input', () => {
+        document.getElementById(slider.dataset.label).textContent = slider.value;
+        updateLiveScore();
+      });
+    });
+
+    // ── Save audit ────────────────────────────────────────────
+    document.getElementById('audit-form').addEventListener('submit', e => {
+      e.preventDefault();
+      const clientSel = document.getElementById('f-client');
+      const clientId = clientSel.value;
+      const clientName = clientSel.options[clientSel.selectedIndex]?.dataset.name || '—';
+      const posting = parseInt(document.getElementById('s-posting').value);
+      const content = parseInt(document.getElementById('s-content').value);
+      const profile = parseInt(document.getElementById('s-profile').value);
+      const engagement = parseInt(document.getElementById('s-engagement').value);
+      const hashtag = parseInt(document.getElementById('s-hashtag').value);
+      const score = Math.round((posting + content + profile + engagement + hashtag) / 5);
+
+      const audit = {
+        id: Date.now().toString(),
+        clientId,
+        clientName,
+        date: document.getElementById('f-date').value,
+        posting, content, profile, engagement, hashtag,
+        score,
+        recommendations: document.getElementById('f-recommendations').value.trim(),
+        status: document.getElementById('f-status').value
+      };
+
+      const audits = getData('audits');
+      audits.push(audit);
+      saveData('audits', audits);
+      closeModal();
+      renderAuditList();
+      showDetail(audit);
+    });
+
+    // ── Cloud Sync ────────────────────────────────────────────
+    const SYNC_CONFIG = {
+      get binId() { return localStorage.getItem('brewstudio_bin_id'); },
+      get apiKey() { return localStorage.getItem('brewstudio_api_key'); }
+    };
+    const SYNC_KEYS = ['clients', 'tasks', 'audits', 'invoices', 'settings', 'checklist'];
+
+    let syncTimeout;
+    function scheduleSync() {
+      clearTimeout(syncTimeout);
+      syncTimeout = setTimeout(pushToCloud, 2000);
+    }
+    function updateSyncStatus(status) {
+      const colors = { synced: '#3D5A3E', syncing: '#D4A843', error: '#C4553A' };
+      const labels = { synced: 'Synced', syncing: 'Syncing…', error: 'Offline' };
+      document.getElementById('sync-dot').style.backgroundColor = colors[status];
+      document.getElementById('sync-label').textContent = labels[status];
+    }
+    async function pushToCloud() {
+      if (!SYNC_CONFIG.binId || !SYNC_CONFIG.apiKey) return;
+      updateSyncStatus('syncing');
+      const payload = {};
+      SYNC_KEYS.forEach(k => { payload[k] = getData(k); });
+      try {
+        await fetch(`https://api.jsonbin.io/v3/b/${SYNC_CONFIG.binId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'X-Master-Key': SYNC_CONFIG.apiKey },
+          body: JSON.stringify(payload)
+        });
+        localStorage.setItem('brewstudio_last_sync', Date.now());
+        updateSyncStatus('synced');
+      } catch { updateSyncStatus('error'); }
+    }
+    async function pullFromCloud() {
+      if (!SYNC_CONFIG.binId || !SYNC_CONFIG.apiKey) return;
+      updateSyncStatus('syncing');
+      try {
+        const res = await fetch(`https://api.jsonbin.io/v3/b/${SYNC_CONFIG.binId}/latest`, {
+          headers: { 'X-Master-Key': SYNC_CONFIG.apiKey }
+        });
+        const json = await res.json();
+        const data = json.record || {};
+        SYNC_KEYS.forEach(k => { if (data[k]) localStorage.setItem('brewstudio_' + k, JSON.stringify(data[k])); });
+        localStorage.setItem('brewstudio_last_sync', Date.now());
+        updateSyncStatus('synced');
+      } catch { updateSyncStatus('error'); }
+    }
+    async function autoSync() {
+      const lastSync = localStorage.getItem('brewstudio_last_sync');
+      if (!lastSync || Date.now() - parseInt(lastSync) > 30 * 60 * 1000) await pullFromCloud();
+    }
+
+    // ── Mobile sidebar ────────────────────────────────────────
+    document.getElementById('hamburger').addEventListener('click', () => {
+      document.getElementById('sidebar').classList.toggle('open');
+    });
+
+    // ── Init ──────────────────────────────────────────────────
+    autoSync().then(() => renderAuditList());
+  </script>
+
+</body>
+</html>
