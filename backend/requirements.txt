@@ -13,7 +13,7 @@ python-multipart==0.0.12
 cryptography==43.0.1
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
-belvo-python==1.1.0
+belvo-python==0.39.1
 
 # Dev/test
 pytest==8.3.3
