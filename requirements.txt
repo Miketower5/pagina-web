@@ -1,0 +1,22 @@
+# Claude API
+anthropic>=0.40.0
+
+# Google Cloud — Vertex AI (Imagen 3 + Veo 2)
+google-cloud-aiplatform>=1.70.0
+
+# ElevenLabs TTS
+elevenlabs>=1.4.0
+
+# OpenAI Whisper
+openai>=1.55.0
+
+# YouTube Data API v3
+google-api-python-client>=2.150.0
+google-auth>=2.35.0
+google-auth-oauthlib>=1.2.0
+
+# TikTok / HTTP calls
+requests>=2.32.0
+
+# Env file support
+python-dotenv>=1.0.0
