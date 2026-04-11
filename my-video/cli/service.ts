@@ -83,7 +83,9 @@ function saveUint8ArrayToPng(uint8Array: Uint8Array, filePath: string) {
 }
 
 interface FalFluxOutput {
-  images: Array<{ url: string; width: number; height: number; content_type: string }>;
+  data: {
+    images: Array<{ url: string; width: number; height: number; content_type: string }>;
+  };
 }
 
 export const generateAiImage = async ({
@@ -111,8 +113,7 @@ export const generateAiImage = async ({
         },
       }) as unknown as FalFluxOutput;
 
-      console.log("Fal response:", JSON.stringify(result, null, 2));
-      const imageUrl = result.images?.[0]?.url;
+      const imageUrl = result.data?.images?.[0]?.url;
       if (!imageUrl) throw new Error("Fal.ai returned no image URL");
 
       const res = await fetch(imageUrl);
