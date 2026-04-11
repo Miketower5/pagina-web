@@ -226,7 +226,7 @@ function renderStory(slug: string): void {
   if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
 
   console.log(chalk.blue(`\n🎬 Rendering "${slug}"...`));
-  execSync(`npx remotion render src/index.ts ${slug} out/${slug}.mp4`, {
+  execSync(`npx remotion render src/index.ts ${slug} out/${slug}.mp4 --concurrency 1`, {
     stdio: "inherit",
     cwd: process.cwd(),
   });
