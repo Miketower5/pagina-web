@@ -51,7 +51,7 @@ export const geminiStructuredCompletion = async <T>(
   prompt: string,
   schema: z.ZodType<T>,
 ): Promise<T> => {
-  const ai = new GoogleGenAI({ apiKey: apiKey!, httpOptions: { apiVersion: "v1" } });
+  const ai = new GoogleGenAI({ apiKey: apiKey!, httpOptions: { apiVersion: "v1beta" } });
   const jsonSchema = z.toJSONSchema(schema);
   const googleSchema = toGoogleSchema(jsonSchema as Record<string, unknown>);
 
