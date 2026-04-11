@@ -1,4 +1,5 @@
 import { GoogleGenAI, HarmCategory, HarmBlockThreshold } from "@google/genai";
+import { fal } from "@fal-ai/client";
 import z from "zod";
 import * as fs from "fs";
 import { ElevenLabsClient } from "@elevenlabs/elevenlabs-js";
@@ -8,6 +9,10 @@ let apiKey: string | null = null;
 
 export const setApiKey = (key: string) => {
   apiKey = key;
+};
+
+export const setFalApiKey = (key: string) => {
+  fal.config({ credentials: key });
 };
 
 const SAFETY_SETTINGS = [
@@ -77,6 +82,10 @@ function saveUint8ArrayToPng(uint8Array: Uint8Array, filePath: string) {
   fs.writeFileSync(filePath, buffer as Uint8Array);
 }
 
+interface FalFluxOutput {
+  images: Array<{ url: string; width: number; height: number; content_type: string }>;
+}
+
 export const generateAiImage = async ({
   prompt,
   path,
@@ -86,28 +95,30 @@ export const generateAiImage = async ({
   path: string;
   onRetry: (attempt: number) => void;
 }) => {
-  const ai = new GoogleGenAI({ apiKey: apiKey! });
   const maxRetries = 3;
   let attempt = 0;
   let lastError: Error | null = null;
 
   while (attempt < maxRetries) {
     try {
-      const response = await ai.models.generateImages({
-        model: "imagen-3.0-generate-001",
-        prompt,
-        config: {
-          numberOfImages: 1,
-          aspectRatio: "9:16",
-          outputMimeType: "image/png",
+      const result = await fal.run("fal-ai/flux/schnell", {
+        input: {
+          prompt,
+          image_size: { width: 1024, height: 1792 },
+          num_images: 1,
+          output_format: "png",
+          enable_safety_checker: false,
         },
-      });
+      }) as unknown as FalFluxOutput;
 
-      const imageBytes = response.generatedImages?.[0]?.image?.imageBytes;
-      if (!imageBytes) throw new Error("Imagen 3 returned no image data");
+      const imageUrl = result.images?.[0]?.url;
+      if (!imageUrl) throw new Error("Fal.ai returned no image URL");
 
-      const buffer = Buffer.from(imageBytes, "base64");
-      saveUint8ArrayToPng(new Uint8Array(buffer), path);
+      const res = await fetch(imageUrl);
+      if (!res.ok) throw new Error(`Failed to download image from Fal.ai: ${res.status}`);
+
+      const arrayBuffer = await res.arrayBuffer();
+      saveUint8ArrayToPng(new Uint8Array(arrayBuffer), path);
       return;
     } catch (e) {
       lastError = e instanceof Error ? e : new Error(String(e));

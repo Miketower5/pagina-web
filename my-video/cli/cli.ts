@@ -13,6 +13,7 @@ import {
   getGenerateStoryPrompt,
   geminiStructuredCompletion,
   setApiKey,
+  setFalApiKey,
 } from "./service";
 import {
   ContentItemWithDetails,
@@ -31,6 +32,7 @@ dotenv.config({ quiet: true });
 interface GenerateOptions {
   apiKey?: string;
   elevenlabsApiKey?: string;
+  falApiKey?: string;
   title?: string;
   topic?: string;
 }
@@ -89,6 +91,7 @@ async function generateStory(options: GenerateOptions) {
     let apiKey = options.apiKey || process.env.GEMINI_API_KEY;
     let elevenlabsApiKey =
       options.elevenlabsApiKey || process.env.ELEVENLABS_API_KEY;
+    let falApiKey = options.falApiKey || process.env.FAL_KEY;
 
     if (!apiKey) {
       const response = await prompts({
@@ -121,6 +124,22 @@ async function generateStory(options: GenerateOptions) {
       }
 
       elevenlabsApiKey = response.elevenlabsApiKey;
+    }
+
+    if (!falApiKey) {
+      const response = await prompts({
+        type: "password",
+        name: "falApiKey",
+        message: "Enter your Fal.ai API key:",
+        validate: (value) => value.length > 0 || "Fal.ai API key is required",
+      });
+
+      if (!response.falApiKey) {
+        console.log(chalk.red("Fal.ai API key is required. Exiting..."));
+        process.exit(1);
+      }
+
+      falApiKey = response.falApiKey;
     }
 
     let { title, topic } = options;
@@ -162,6 +181,7 @@ async function generateStory(options: GenerateOptions) {
 
     const storySpinner = ora("Generating story...").start();
     setApiKey(apiKey!);
+    setFalApiKey(falApiKey!);
     const storyRes = await geminiStructuredCompletion(
       getGenerateStoryPrompt(title!, topic!),
       StoryScript,

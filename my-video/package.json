@@ -12,6 +12,7 @@
   "repository": {},
   "license": "UNLICENSED",
   "dependencies": {
+    "@fal-ai/client": "^1.9.5",
     "@google/genai": "^1.49.0",
     "@remotion/animation-utils": "4.0.448",
     "@remotion/cli": "4.0.448",
