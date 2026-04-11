@@ -111,6 +111,7 @@ export const generateAiImage = async ({
         },
       }) as unknown as FalFluxOutput;
 
+      console.log("Fal response:", JSON.stringify(result, null, 2));
       const imageUrl = result.images?.[0]?.url;
       if (!imageUrl) throw new Error("Fal.ai returned no image URL");
 
