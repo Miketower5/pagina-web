@@ -12,6 +12,7 @@
   "repository": {},
   "license": "UNLICENSED",
   "dependencies": {
+    "@google/genai": "^1.49.0",
     "@remotion/animation-utils": "4.0.448",
     "@remotion/cli": "4.0.448",
     "@remotion/google-fonts": "4.0.448",

@@ -11,7 +11,7 @@ import {
   generateVoice,
   getGenerateImageDescriptionPrompt,
   getGenerateStoryPrompt,
-  openaiStructuredCompletion,
+  geminiStructuredCompletion,
   setApiKey,
 } from "./service";
 import {
@@ -86,7 +86,7 @@ class ContentFS {
 
 async function generateStory(options: GenerateOptions) {
   try {
-    let apiKey = options.apiKey || process.env.OPENAI_API_KEY;
+    let apiKey = options.apiKey || process.env.GEMINI_API_KEY;
     let elevenlabsApiKey =
       options.elevenlabsApiKey || process.env.ELEVENLABS_API_KEY;
 
@@ -94,7 +94,7 @@ async function generateStory(options: GenerateOptions) {
       const response = await prompts({
         type: "password",
         name: "apiKey",
-        message: "Enter your OpenAI API key:",
+        message: "Enter your Gemini API key:",
         validate: (value) => value.length > 0 || "API key is required",
       });
 
@@ -162,14 +162,14 @@ async function generateStory(options: GenerateOptions) {
 
     const storySpinner = ora("Generating story...").start();
     setApiKey(apiKey!);
-    const storyRes = await openaiStructuredCompletion(
+    const storyRes = await geminiStructuredCompletion(
       getGenerateStoryPrompt(title!, topic!),
       StoryScript,
     );
     storySpinner.succeed(chalk.green("Story generated!"));
 
     const descriptionsSpinner = ora("Generating image descriptions...").start();
-    const storyWithImagesRes = await openaiStructuredCompletion(
+    const storyWithImagesRes = await geminiStructuredCompletion(
       getGenerateImageDescriptionPrompt(storyRes.text),
       StoryWithImages,
     );
@@ -239,7 +239,7 @@ yargs(hideBin(process.argv))
         .option("api-key", {
           alias: "k",
           type: "string",
-          description: "OpenAI API key",
+          description: "Gemini API key",
         })
         .option("title", {
           alias: "t",
@@ -269,7 +269,7 @@ yargs(hideBin(process.argv))
         .option("api-key", {
           alias: "k",
           type: "string",
-          description: "OpenAI API key",
+          description: "Gemini API key",
         })
         .option("title", {
           alias: "t",
