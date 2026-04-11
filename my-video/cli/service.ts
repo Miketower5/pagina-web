@@ -56,7 +56,7 @@ export const geminiStructuredCompletion = async <T>(
   const googleSchema = toGoogleSchema(jsonSchema as Record<string, unknown>);
 
   const response = await ai.models.generateContent({
-    model: "gemini-2.0-flash",
+    model: "gemini-2.0-flash-001",
     contents: prompt,
     config: {
       responseMimeType: "application/json",
