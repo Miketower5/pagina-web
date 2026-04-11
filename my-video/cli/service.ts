@@ -51,12 +51,12 @@ export const geminiStructuredCompletion = async <T>(
   prompt: string,
   schema: z.ZodType<T>,
 ): Promise<T> => {
-  const ai = new GoogleGenAI({ apiKey: apiKey!, httpOptions: { apiVersion: "v1beta" } });
+  const ai = new GoogleGenAI({ apiKey: apiKey! });
   const jsonSchema = z.toJSONSchema(schema);
   const googleSchema = toGoogleSchema(jsonSchema as Record<string, unknown>);
 
   const response = await ai.models.generateContent({
-    model: "gemini-1.5-flash",
+    model: "gemini-2.5-flash",
     contents: prompt,
     config: {
       responseMimeType: "application/json",
@@ -86,7 +86,7 @@ export const generateAiImage = async ({
   path: string;
   onRetry: (attempt: number) => void;
 }) => {
-  const ai = new GoogleGenAI({ apiKey: apiKey!, httpOptions: { apiVersion: "v1beta" } });
+  const ai = new GoogleGenAI({ apiKey: apiKey! });
   const maxRetries = 3;
   let attempt = 0;
   let lastError: Error | null = null;
