@@ -4,11 +4,720 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BrewStudio — Specialty Coffee Marketing</title>
+  <style>
+    /* ── Reset & Variables ───────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0f0d0b;
+      --bg-card:   #1a1714;
+      --bg-card2:  #221e1a;
+      --border:    #2e2822;
+      --text:      #f5f0e8;
+      --muted:     #9a8e81;
+      --amber:     #D4A843;
+      --amber-dim: #a07e2e;
+      --moss:      #7B9E5A;
+      --sky:       #5BA4CF;
+      --terra:     #C4553A;
+      --gold:      #E8C547;
+      --dark-card: #2a2420;
+      --radius:    12px;
+      --transition: 0.25s ease;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    a { text-decoration: none; color: inherit; }
+    ul { list-style: none; }
+
+    /* ── Custom Cursor ───────────────────────────────────────── */
+    #cursor {
+      position: fixed;
+      width: 12px; height: 12px;
+      background: var(--amber);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: transform 0.1s ease, width 0.2s ease, height 0.2s ease, opacity 0.2s ease;
+      mix-blend-mode: screen;
+    }
+    #cursor.hovering {
+      width: 36px; height: 36px;
+      background: rgba(212, 168, 67, 0.3);
+      border: 2px solid var(--amber);
+    }
+
+    /* ── Navbar ──────────────────────────────────────────────── */
+    #navbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem 2.5rem;
+      transition: background var(--transition), padding var(--transition), box-shadow var(--transition);
+    }
+    #navbar.scrolled {
+      background: rgba(15, 13, 11, 0.96);
+      backdrop-filter: blur(12px);
+      padding: 0.9rem 2.5rem;
+      box-shadow: 0 1px 0 var(--border);
+    }
+
+    #logo {
+      font-size: 1.3rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--amber);
+    }
+
+    #navbar > ul {
+      display: flex;
+      gap: 2.2rem;
+    }
+    #navbar > ul a {
+      font-size: 0.9rem;
+      color: var(--muted);
+      transition: color var(--transition);
+    }
+    #navbar > ul a:hover { color: var(--text); }
+
+    #navbar > div {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+    #navbar > div a:first-child {
+      font-size: 0.875rem;
+      color: var(--muted);
+      transition: color var(--transition);
+    }
+    #navbar > div a:first-child:hover { color: var(--text); }
+    #navbar > div a:last-child {
+      font-size: 0.875rem;
+      background: var(--amber);
+      color: #0f0d0b;
+      font-weight: 600;
+      padding: 0.5rem 1.1rem;
+      border-radius: 6px;
+      transition: background var(--transition), transform var(--transition);
+    }
+    #navbar > div a:last-child:hover {
+      background: var(--gold);
+      transform: translateY(-1px);
+    }
+
+    #hamburger {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--text);
+      font-size: 1.4rem;
+      cursor: none;
+    }
+
+    /* Mobile nav overlay */
+    #mobile-nav {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 13, 11, 0.98);
+      z-index: 99;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2rem;
+    }
+    #mobile-nav.open { display: flex; }
+    #mobile-nav a {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--muted);
+      transition: color var(--transition);
+    }
+    #mobile-nav a:hover { color: var(--amber); }
+    #mobile-close {
+      position: absolute;
+      top: 1.5rem; right: 2rem;
+      background: none; border: none;
+      color: var(--muted); font-size: 1.6rem;
+      cursor: none;
+    }
+
+    /* ── Hero ────────────────────────────────────────────────── */
+    #hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 8rem 1.5rem 4rem;
+      overflow: hidden;
+    }
+
+    #particles {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    #hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 720px;
+    }
+    #hero-content h1 {
+      font-size: clamp(2.4rem, 6vw, 4.2rem);
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.08;
+      margin-bottom: 1.25rem;
+    }
+    #hero-content h1 span { color: var(--amber); }
+    #hero-content p {
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 2.25rem;
+      max-width: 540px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    #hero-content a {
+      display: inline-block;
+      background: var(--amber);
+      color: #0f0d0b;
+      font-weight: 700;
+      font-size: 1rem;
+      padding: 0.85rem 2rem;
+      border-radius: 8px;
+      transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+      box-shadow: 0 4px 24px rgba(212, 168, 67, 0.25);
+    }
+    #hero-content a:hover {
+      background: var(--gold);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(212, 168, 67, 0.4);
+    }
+
+    #hero-stats {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      gap: 3rem;
+      margin-top: 4.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .stat {
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 2.4rem;
+      font-weight: 800;
+      color: var(--amber);
+      letter-spacing: -0.04em;
+      line-height: 1;
+    }
+    .stat p {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-top: 0.35rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    /* ── Ticker ──────────────────────────────────────────────── */
+    #ticker {
+      overflow: hidden;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 0.85rem 0;
+      background: var(--bg-card);
+    }
+    #ticker-track {
+      display: flex;
+      gap: 0;
+      white-space: nowrap;
+      animation: ticker 28s linear infinite;
+      width: max-content;
+    }
+    #ticker-track span {
+      font-size: 0.8rem;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+      padding-right: 0;
+    }
+    @keyframes ticker {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    /* ── Section shared ──────────────────────────────────────── */
+    section {
+      padding: 6rem 1.5rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    section h2 {
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 3rem;
+      text-align: center;
+    }
+
+    /* Reveal animation */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+    .reveal-delay-5 { transition-delay: 0.5s; }
+    .reveal-delay-6 { transition-delay: 0.6s; }
+
+    /* ── Services ────────────────────────────────────────────── */
+    #services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.25rem;
+    }
+    .service-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.75rem;
+      transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
+      cursor: default;
+    }
+    .service-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+    }
+    .service-card[data-color="sky"]:hover  { border-color: var(--sky); }
+    .service-card[data-color="moss"]:hover { border-color: var(--moss); }
+    .service-card[data-color="amber"]:hover{ border-color: var(--amber); }
+    .service-card[data-color="terra"]:hover{ border-color: var(--terra); }
+    .service-card[data-color="gold"]:hover { border-color: var(--gold); }
+    .service-card[data-color="dark"]:hover { border-color: #6e5e50; }
+
+    .service-icon {
+      width: 40px; height: 40px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+    }
+    .service-card[data-color="sky"]   .service-icon { background: rgba(91,164,207,0.15); color: var(--sky); }
+    .service-card[data-color="moss"]  .service-icon { background: rgba(123,158,90,0.15); color: var(--moss); }
+    .service-card[data-color="amber"] .service-icon { background: rgba(212,168,67,0.15); color: var(--amber); }
+    .service-card[data-color="terra"] .service-icon { background: rgba(196,85,58,0.15);  color: var(--terra); }
+    .service-card[data-color="gold"]  .service-icon { background: rgba(232,197,71,0.15); color: var(--gold); }
+    .service-card[data-color="dark"]  .service-icon { background: rgba(110,94,80,0.15);  color: #c8b89a; }
+
+    .service-card h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+    }
+    .service-card p {
+      font-size: 0.875rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* ── Problem ─────────────────────────────────────────────── */
+    #problem {
+      background: var(--bg-card);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      max-width: 100%;
+      padding: 6rem 1.5rem;
+    }
+    #problem > * { max-width: 1100px; margin-left: auto; margin-right: auto; }
+    #problem h2 { max-width: 1100px; }
+
+    #problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.25rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .pain-point {
+      background: var(--bg-card2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    .pain-icon {
+      font-size: 1.3rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .pain-point p {
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* ── Process ─────────────────────────────────────────────── */
+    #process-steps {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      flex-wrap: wrap;
+    }
+    .step {
+      text-align: center;
+      flex: 1;
+      min-width: 160px;
+      max-width: 200px;
+      padding: 0 0.5rem;
+    }
+    .step-number {
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      background: var(--amber);
+      color: #0f0d0b;
+      font-weight: 800;
+      font-size: 1.1rem;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1rem;
+    }
+    .step h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.4rem; }
+    .step p  { font-size: 0.82rem; color: var(--muted); line-height: 1.5; }
+
+    .step-connector {
+      flex: 0 0 60px;
+      height: 2px;
+      background: var(--border);
+      margin-top: -1.5rem;
+      position: relative;
+    }
+    .step-connector::after {
+      content: '';
+      position: absolute;
+      right: -4px; top: -4px;
+      border: 4px solid transparent;
+      border-left: 8px solid var(--border);
+    }
+
+    /* ── Pricing ─────────────────────────────────────────────── */
+    #pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.25rem;
+      align-items: start;
+    }
+    .plan-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      position: relative;
+      transition: transform var(--transition), box-shadow var(--transition);
+    }
+    .plan-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 48px rgba(0,0,0,0.4);
+    }
+    .plan-card.featured {
+      border-color: var(--amber);
+      background: linear-gradient(160deg, #221e1a 0%, #1a1714 100%);
+      box-shadow: 0 8px 40px rgba(212, 168, 67, 0.15);
+    }
+    .badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: var(--amber);
+      color: #0f0d0b;
+      padding: 0.25rem 0.7rem;
+      border-radius: 20px;
+      margin-bottom: 1rem;
+    }
+    .plan-card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.75rem; }
+    .price {
+      font-size: 2.6rem;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      color: var(--amber);
+      margin-bottom: 1.5rem;
+      line-height: 1;
+    }
+    .price span { font-size: 1rem; font-weight: 500; color: var(--muted); }
+    .plan-card ul { margin-bottom: 2rem; }
+    .plan-card ul li {
+      font-size: 0.875rem;
+      color: var(--muted);
+      padding: 0.45rem 0;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .plan-card ul li::before {
+      content: '✓';
+      color: var(--moss);
+      font-weight: 700;
+      font-size: 0.8rem;
+    }
+    .plan-card a {
+      display: block;
+      text-align: center;
+      padding: 0.75rem;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      transition: background var(--transition), color var(--transition), transform var(--transition);
+      border: 2px solid var(--border);
+      color: var(--muted);
+    }
+    .plan-card a:hover {
+      border-color: var(--amber);
+      color: var(--amber);
+      transform: translateY(-1px);
+    }
+    .plan-card.featured a {
+      background: var(--amber);
+      color: #0f0d0b;
+      border-color: var(--amber);
+    }
+    .plan-card.featured a:hover {
+      background: var(--gold);
+      transform: translateY(-1px);
+    }
+
+    /* ── Audit ───────────────────────────────────────────────── */
+    #audit {
+      max-width: 100%;
+      background: var(--bg-card);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 6rem 1.5rem;
+    }
+    #audit-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+    #audit-left h2 {
+      text-align: left;
+      margin-bottom: 0.75rem;
+    }
+    #audit-left p {
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.7;
+      margin-bottom: 1.75rem;
+    }
+    #audit-form {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+    #audit-form input {
+      flex: 1;
+      min-width: 200px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      color: var(--text);
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color var(--transition);
+    }
+    #audit-form input:focus { border-color: var(--amber); }
+    #audit-form button {
+      background: var(--amber);
+      color: #0f0d0b;
+      font-weight: 700;
+      font-size: 0.9rem;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      cursor: none;
+      transition: background var(--transition), transform var(--transition);
+      white-space: nowrap;
+    }
+    #audit-form button:hover { background: var(--gold); transform: translateY(-1px); }
+
+    #audit-right {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.75rem;
+    }
+    #score-ring {
+      position: relative;
+      width: 140px; height: 140px;
+    }
+    #score-ring svg {
+      width: 100%; height: 100%;
+      transform: rotate(-90deg);
+    }
+    #score-ring svg circle:first-child { stroke: var(--border); }
+    #score-arc { stroke: var(--amber); stroke-linecap: round; stroke-dasharray: 314; stroke-dashoffset: 314; transition: stroke-dashoffset 1.4s ease; }
+    #score-number {
+      position: absolute;
+      inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--amber);
+    }
+    #score-number span { font-size: 0.75rem; color: var(--muted); font-weight: 500; }
+
+    #score-metrics { width: 100%; max-width: 280px; display: flex; flex-direction: column; gap: 1rem; }
+    .metric span { font-size: 0.8rem; color: var(--muted); display: block; margin-bottom: 0.35rem; }
+    .bar { background: var(--border); border-radius: 4px; height: 6px; overflow: hidden; }
+    .bar-fill { height: 100%; background: var(--amber); border-radius: 4px; width: 0; transition: width 1s ease; }
+
+    /* ── Testimonials ────────────────────────────────────────── */
+    #testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.25rem;
+    }
+    .testimonial {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+    .testimonial blockquote {
+      font-size: 0.93rem;
+      color: var(--text);
+      line-height: 1.7;
+      font-style: italic;
+    }
+    .testimonial blockquote::before { content: '"'; color: var(--amber); font-size: 1.4rem; line-height: 0; vertical-align: -6px; margin-right: 3px; }
+    .testimonial cite {
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-style: normal;
+      font-weight: 600;
+    }
+
+    /* ── Final CTA ───────────────────────────────────────────── */
+    #cta-final {
+      text-align: center;
+      padding: 7rem 1.5rem;
+    }
+    #cta-final h2 { margin-bottom: 0.75rem; }
+    #cta-final > p:first-of-type {
+      color: var(--muted);
+      font-size: 1.05rem;
+      margin-bottom: 2.25rem;
+    }
+    #cta-final a.cta-btn {
+      display: inline-block;
+      background: var(--amber);
+      color: #0f0d0b;
+      font-weight: 700;
+      font-size: 1rem;
+      padding: 0.9rem 2.25rem;
+      border-radius: 8px;
+      transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+      box-shadow: 0 4px 24px rgba(212, 168, 67, 0.25);
+    }
+    #cta-final a.cta-btn:hover {
+      background: var(--gold);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 36px rgba(212, 168, 67, 0.4);
+    }
+    #cta-final > p:last-of-type {
+      margin-top: 1.5rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    #cta-final > p:last-of-type a {
+      color: var(--amber);
+      transition: color var(--transition);
+    }
+    #cta-final > p:last-of-type a:hover { color: var(--gold); }
+
+    /* ── Footer ──────────────────────────────────────────────── */
+    #footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      max-width: 100%;
+    }
+    #footer-logo { color: var(--amber); font-weight: 700; font-size: 1rem; }
+    #footer > span:nth-child(2) { font-size: 0.8rem; color: var(--muted); }
+    #footer nav { display: flex; gap: 1.5rem; }
+    #footer nav a { font-size: 0.8rem; color: var(--muted); transition: color var(--transition); }
+    #footer nav a:hover { color: var(--text); }
+
+    /* ── Responsive ──────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      #navbar > ul, #navbar > div { display: none; }
+      #hamburger { display: block; }
+
+      #audit-inner { grid-template-columns: 1fr; gap: 2.5rem; }
+      #audit-left h2 { text-align: center; }
+      #audit-right { align-items: center; }
+
+      .step-connector { display: none; }
+      #process-steps { flex-direction: column; align-items: center; gap: 2rem; }
+
+      #footer { flex-direction: column; text-align: center; }
+      #footer nav { justify-content: center; }
+    }
+  </style>
 </head>
 <body>
 
   <!-- Custom cursor -->
   <div id="cursor"></div>
+
+  <!-- Mobile nav -->
+  <div id="mobile-nav">
+    <button id="mobile-close">&#10005;</button>
+    <a href="#services">Services</a>
+    <a href="#process">Process</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#about">About</a>
+    <a href="#audit" style="color:var(--amber)">Free Audit</a>
+  </div>
 
   <!-- NAVBAR -->
   <nav id="navbar">
@@ -30,21 +739,21 @@
   <section id="hero">
     <canvas id="particles"></canvas>
     <div id="hero-content">
-      <h1>Your café deserves to be seen.</h1>
+      <h1>Your café deserves<br>to be <span>seen.</span></h1>
       <p>We help specialty coffee shops in Norway grow their online presence — honestly and consistently.</p>
       <a href="#audit">Get your free audit</a>
     </div>
     <div id="hero-stats">
-      <div class="stat">
-        <span class="count" data-target="3">0</span><span>×</span>
+      <div class="stat reveal">
+        <div class="stat-value"><span class="count" data-target="3">0</span>×</div>
         <p>Average growth in 6 months</p>
       </div>
-      <div class="stat">
-        <span class="count" data-target="12">0</span>
+      <div class="stat reveal reveal-delay-2">
+        <div class="stat-value"><span class="count" data-target="12">0</span></div>
         <p>Specialty cafés</p>
       </div>
-      <div class="stat">
-        <span class="count" data-target="100">0</span><span>%</span>
+      <div class="stat reveal reveal-delay-4">
+        <div class="stat-value"><span class="count" data-target="100">0</span>%</div>
         <p>Specialty coffee focus</p>
       </div>
     </div>
@@ -53,41 +762,42 @@
   <!-- TICKER -->
   <div id="ticker">
     <div id="ticker-track">
-      <span>Social Media · Content Creation · Website Design · Brand Identity · Strategy · Full Package · Social Media · Content Creation · Website Design · Brand Identity · Strategy · Full Package ·</span>
+      <span>Social Media &nbsp;·&nbsp; Content Creation &nbsp;·&nbsp; Website Design &nbsp;·&nbsp; Brand Identity &nbsp;·&nbsp; Strategy &nbsp;·&nbsp; Full Package &nbsp;·&nbsp; Social Media &nbsp;·&nbsp; Content Creation &nbsp;·&nbsp; Website Design &nbsp;·&nbsp; Brand Identity &nbsp;·&nbsp; Strategy &nbsp;·&nbsp; Full Package &nbsp;·&nbsp; Social Media &nbsp;·&nbsp; Content Creation &nbsp;·&nbsp; Website Design &nbsp;·&nbsp; Brand Identity &nbsp;·&nbsp; Strategy &nbsp;·&nbsp; Full Package &nbsp;·&nbsp;</span>
+      <span>Social Media &nbsp;·&nbsp; Content Creation &nbsp;·&nbsp; Website Design &nbsp;·&nbsp; Brand Identity &nbsp;·&nbsp; Strategy &nbsp;·&nbsp; Full Package &nbsp;·&nbsp; Social Media &nbsp;·&nbsp; Content Creation &nbsp;·&nbsp; Website Design &nbsp;·&nbsp; Brand Identity &nbsp;·&nbsp; Strategy &nbsp;·&nbsp; Full Package &nbsp;·&nbsp; Social Media &nbsp;·&nbsp; Content Creation &nbsp;·&nbsp; Website Design &nbsp;·&nbsp; Brand Identity &nbsp;·&nbsp; Strategy &nbsp;·&nbsp; Full Package &nbsp;·&nbsp;</span>
     </div>
   </div>
 
   <!-- SERVICES -->
   <section id="services">
-    <h2>What we do</h2>
+    <h2 class="reveal">What we do</h2>
     <div id="services-grid">
-      <div class="service-card" data-color="sky">
-        <svg><!-- icon --></svg>
+      <div class="service-card reveal reveal-delay-1" data-color="sky">
+        <div class="service-icon">📱</div>
         <h3>Social Media</h3>
         <p>Consistent presence across Instagram and beyond.</p>
       </div>
-      <div class="service-card" data-color="moss">
-        <svg><!-- icon --></svg>
+      <div class="service-card reveal reveal-delay-2" data-color="moss">
+        <div class="service-icon">📷</div>
         <h3>Content Creation</h3>
         <p>Photography, copy, and creative that feels genuine.</p>
       </div>
-      <div class="service-card" data-color="amber">
-        <svg><!-- icon --></svg>
+      <div class="service-card reveal reveal-delay-3" data-color="amber">
+        <div class="service-icon">🖥</div>
         <h3>Website Design</h3>
         <p>Clean, fast sites that reflect your café's character.</p>
       </div>
-      <div class="service-card" data-color="terra">
-        <svg><!-- icon --></svg>
+      <div class="service-card reveal reveal-delay-4" data-color="terra">
+        <div class="service-icon">✏️</div>
         <h3>Brand Identity</h3>
         <p>Logo, colours, and tone that hold together everywhere.</p>
       </div>
-      <div class="service-card" data-color="gold">
-        <svg><!-- icon --></svg>
+      <div class="service-card reveal reveal-delay-5" data-color="gold">
+        <div class="service-icon">📊</div>
         <h3>Strategy</h3>
         <p>A clear plan built around your goals, not vanity metrics.</p>
       </div>
-      <div class="service-card" data-color="dark">
-        <svg><!-- icon --></svg>
+      <div class="service-card reveal reveal-delay-6" data-color="dark">
+        <div class="service-icon">☕</div>
         <h3>Full Package</h3>
         <p>Everything, handled. You focus on the coffee.</p>
       </div>
@@ -96,22 +806,22 @@
 
   <!-- PROBLEM -->
   <section id="problem">
-    <h2>Sound familiar?</h2>
+    <h2 class="reveal">Sound familiar?</h2>
     <div id="problem-grid">
-      <div class="pain-point">
-        <svg><!-- icon --></svg>
+      <div class="pain-point reveal reveal-delay-1">
+        <span class="pain-icon">😩</span>
         <p>Posting inconsistently and losing followers</p>
       </div>
-      <div class="pain-point">
-        <svg><!-- icon --></svg>
+      <div class="pain-point reveal reveal-delay-2">
+        <span class="pain-icon">👻</span>
         <p>Great coffee, invisible online</p>
       </div>
-      <div class="pain-point">
-        <svg><!-- icon --></svg>
+      <div class="pain-point reveal reveal-delay-3">
+        <span class="pain-icon">⏰</span>
         <p>No time to think about content</p>
       </div>
-      <div class="pain-point">
-        <svg><!-- icon --></svg>
+      <div class="pain-point reveal reveal-delay-4">
+        <span class="pain-icon">🔍</span>
         <p>No clear brand identity</p>
       </div>
     </div>
@@ -119,27 +829,27 @@
 
   <!-- PROCESS -->
   <section id="process">
-    <h2>How it works</h2>
+    <h2 class="reveal">How it works</h2>
     <div id="process-steps">
-      <div class="step">
+      <div class="step reveal reveal-delay-1">
         <div class="step-number">1</div>
         <h3>Free Audit</h3>
         <p>We analyse your current online presence</p>
       </div>
-      <div class="step-connector"></div>
-      <div class="step">
+      <div class="step-connector reveal reveal-delay-2"></div>
+      <div class="step reveal reveal-delay-2">
         <div class="step-number">2</div>
         <h3>Discovery Call</h3>
         <p>We align on goals and strategy</p>
       </div>
-      <div class="step-connector"></div>
-      <div class="step">
+      <div class="step-connector reveal reveal-delay-3"></div>
+      <div class="step reveal reveal-delay-3">
         <div class="step-number">3</div>
         <h3>Month One</h3>
         <p>Content plan, templates, and first posts live</p>
       </div>
-      <div class="step-connector"></div>
-      <div class="step">
+      <div class="step-connector reveal reveal-delay-4"></div>
+      <div class="step reveal reveal-delay-4">
         <div class="step-number">4</div>
         <h3>Grow Together</h3>
         <p>Monthly reporting and continuous improvement</p>
@@ -149,9 +859,9 @@
 
   <!-- PRICING -->
   <section id="pricing">
-    <h2>Simple pricing</h2>
+    <h2 class="reveal">Simple pricing</h2>
     <div id="pricing-grid">
-      <div class="plan-card">
+      <div class="plan-card reveal reveal-delay-1">
         <h3>Starter</h3>
         <div class="price">$300<span>/mo</span></div>
         <ul>
@@ -161,7 +871,7 @@
         </ul>
         <a href="#audit">Get started</a>
       </div>
-      <div class="plan-card featured">
+      <div class="plan-card featured reveal reveal-delay-2">
         <div class="badge">Most popular</div>
         <h3>Growth</h3>
         <div class="price">$700<span>/mo</span></div>
@@ -173,7 +883,7 @@
         </ul>
         <a href="#audit">Get started</a>
       </div>
-      <div class="plan-card">
+      <div class="plan-card reveal reveal-delay-3">
         <h3>Full Brand</h3>
         <div class="price">$1,500<span>/mo</span></div>
         <ul>
@@ -189,34 +899,36 @@
 
   <!-- AUDIT -->
   <section id="audit">
-    <div id="audit-left">
-      <h2>Get your free audit</h2>
-      <p>We'll review your online presence and tell you exactly where you stand.</p>
-      <form id="audit-form">
-        <input type="email" placeholder="your@email.com" required>
-        <button type="submit">Get my free audit</button>
-      </form>
-    </div>
-    <div id="audit-right">
-      <div id="score-ring">
-        <svg viewBox="0 0 120 120">
-          <circle cx="60" cy="60" r="50" fill="none" stroke-width="10"/>
-          <circle id="score-arc" cx="60" cy="60" r="50" fill="none" stroke-width="10"/>
-        </svg>
-        <div id="score-number">67<span>/100</span></div>
+    <div id="audit-inner">
+      <div id="audit-left" class="reveal">
+        <h2>Get your free audit</h2>
+        <p>We'll review your online presence and tell you exactly where you stand — no commitment, no pressure.</p>
+        <form id="audit-form">
+          <input type="email" placeholder="your@email.com" required>
+          <button type="submit">Get my free audit</button>
+        </form>
       </div>
-      <div id="score-metrics">
-        <div class="metric">
-          <span>Posting Frequency</span>
-          <div class="bar"><div class="bar-fill" style="width:55%"></div></div>
+      <div id="audit-right" class="reveal reveal-delay-2">
+        <div id="score-ring">
+          <svg viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="50" fill="none" stroke-width="10"/>
+            <circle id="score-arc" cx="60" cy="60" r="50" fill="none" stroke-width="10"/>
+          </svg>
+          <div id="score-number">67<span>/100</span></div>
         </div>
-        <div class="metric">
-          <span>Profile Optimisation</span>
-          <div class="bar"><div class="bar-fill" style="width:72%"></div></div>
-        </div>
-        <div class="metric">
-          <span>Engagement Rate</span>
-          <div class="bar"><div class="bar-fill" style="width:40%"></div></div>
+        <div id="score-metrics">
+          <div class="metric">
+            <span>Posting Frequency</span>
+            <div class="bar"><div class="bar-fill" data-width="55"></div></div>
+          </div>
+          <div class="metric">
+            <span>Profile Optimisation</span>
+            <div class="bar"><div class="bar-fill" data-width="72"></div></div>
+          </div>
+          <div class="metric">
+            <span>Engagement Rate</span>
+            <div class="bar"><div class="bar-fill" data-width="40"></div></div>
+          </div>
         </div>
       </div>
     </div>
@@ -224,18 +936,18 @@
 
   <!-- TESTIMONIALS -->
   <section id="testimonials">
-    <h2>From our clients</h2>
+    <h2 class="reveal">From our clients</h2>
     <div id="testimonials-grid">
-      <div class="testimonial">
-        <blockquote>"We went from posting twice a month to having a real brand people recognise. Quiet, consistent work that actually showed up."</blockquote>
+      <div class="testimonial reveal reveal-delay-1">
+        <blockquote>We went from posting twice a month to having a real brand people recognise. Quiet, consistent work that actually showed up.</blockquote>
         <cite>Astrid Haugen — Lysgård Kafé, Bergen</cite>
       </div>
-      <div class="testimonial">
-        <blockquote>"They understood what specialty coffee means to us. The content doesn't feel like marketing — it feels like us."</blockquote>
+      <div class="testimonial reveal reveal-delay-2">
+        <blockquote>They understood what specialty coffee means to us. The content doesn't feel like marketing — it feels like us.</blockquote>
         <cite>Magnus Dahl — Filteret, Trondheim</cite>
       </div>
-      <div class="testimonial">
-        <blockquote>"Simple process, honest reporting. We know what's working and what isn't every single month."</blockquote>
+      <div class="testimonial reveal reveal-delay-3">
+        <blockquote>Simple process, honest reporting. We know what's working and what isn't every single month.</blockquote>
         <cite>Ingrid Solberg — Havnekafé, Stavanger</cite>
       </div>
     </div>
@@ -243,10 +955,10 @@
 
   <!-- FINAL CTA -->
   <section id="cta-final">
-    <h2>Ready to be found?</h2>
-    <p>Start with a free audit — no commitment, no pressure.</p>
-    <a href="#audit">Start with a free audit</a>
-    <p><a href="mailto:hei@brewstudio.no">hei@brewstudio.no</a></p>
+    <h2 class="reveal">Ready to be found?</h2>
+    <p class="reveal reveal-delay-1">Start with a free audit — no commitment, no pressure.</p>
+    <a href="#audit" class="cta-btn reveal reveal-delay-2">Start with a free audit</a>
+    <p class="reveal reveal-delay-3"><a href="mailto:hei@brewstudio.no">hei@brewstudio.no</a></p>
   </section>
 
   <!-- FOOTER -->
@@ -261,7 +973,158 @@
   </footer>
 
   <script>
-    // Placeholder for: particles, scroll reveal, count-up, custom cursor, navbar scroll
+    // ── Custom cursor ─────────────────────────────────────────
+    const cursor = document.getElementById('cursor');
+    document.addEventListener('mousemove', e => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top  = e.clientY + 'px';
+    });
+    document.querySelectorAll('a, button, .service-card, .plan-card').forEach(el => {
+      el.addEventListener('mouseenter', () => cursor.classList.add('hovering'));
+      el.addEventListener('mouseleave', () => cursor.classList.remove('hovering'));
+    });
+
+    // ── Navbar scroll ─────────────────────────────────────────
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 40);
+    });
+
+    // ── Mobile nav ────────────────────────────────────────────
+    document.getElementById('hamburger').addEventListener('click', () => {
+      document.getElementById('mobile-nav').classList.add('open');
+    });
+    document.getElementById('mobile-close').addEventListener('click', () => {
+      document.getElementById('mobile-nav').classList.remove('open');
+    });
+    document.querySelectorAll('#mobile-nav a').forEach(a => {
+      a.addEventListener('click', () => document.getElementById('mobile-nav').classList.remove('open'));
+    });
+
+    // ── Particles canvas ──────────────────────────────────────
+    const canvas = document.getElementById('particles');
+    const ctx = canvas.getContext('2d');
+    let W, H, particles = [];
+
+    function resize() {
+      W = canvas.width  = canvas.offsetWidth;
+      H = canvas.height = canvas.offsetHeight;
+    }
+
+    class Particle {
+      constructor() { this.reset(true); }
+      reset(init) {
+        this.x  = Math.random() * W;
+        this.y  = init ? Math.random() * H : H + 10;
+        this.r  = Math.random() * 1.8 + 0.4;
+        this.vx = (Math.random() - 0.5) * 0.3;
+        this.vy = -(Math.random() * 0.5 + 0.15);
+        this.alpha = Math.random() * 0.5 + 0.1;
+      }
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        if (this.y < -10) this.reset(false);
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(212, 168, 67, ${this.alpha})`;
+        ctx.fill();
+      }
+    }
+
+    function initParticles() {
+      resize();
+      particles = Array.from({ length: 80 }, () => new Particle());
+    }
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, W, H);
+      particles.forEach(p => { p.update(); p.draw(); });
+      requestAnimationFrame(animateParticles);
+    }
+
+    window.addEventListener('resize', () => {
+      resize();
+      particles.forEach(p => { if (p.x > W) p.x = Math.random() * W; });
+    });
+    initParticles();
+    animateParticles();
+
+    // ── Scroll reveal ─────────────────────────────────────────
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          // Animate score ring when audit section is visible
+          if (entry.target.id === 'audit-right' || entry.target.closest('#audit-right')) {
+            animateScoreRing();
+          }
+        }
+      });
+    }, { threshold: 0.15 });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // ── Count-up ──────────────────────────────────────────────
+    const countObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const el = entry.target;
+          const target = parseInt(el.dataset.target, 10);
+          const duration = 1600;
+          const start = performance.now();
+          function tick(now) {
+            const elapsed = now - start;
+            const progress = Math.min(elapsed / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            el.textContent = Math.round(eased * target);
+            if (progress < 1) requestAnimationFrame(tick);
+          }
+          requestAnimationFrame(tick);
+          countObserver.unobserve(el);
+        }
+      });
+    }, { threshold: 0.5 });
+
+    document.querySelectorAll('.count').forEach(el => countObserver.observe(el));
+
+    // ── Score ring animation ───────────────────────────────────
+    let scoreAnimated = false;
+    function animateScoreRing() {
+      if (scoreAnimated) return;
+      scoreAnimated = true;
+      const arc = document.getElementById('score-arc');
+      const circumference = 314;
+      const score = 67;
+      const offset = circumference - (score / 100) * circumference;
+      arc.style.strokeDashoffset = offset;
+      // Animate metric bars
+      document.querySelectorAll('.bar-fill').forEach(bar => {
+        const w = bar.dataset.width;
+        bar.style.width = w + '%';
+      });
+    }
+
+    // Also observe the audit right panel
+    const auditRight = document.getElementById('audit-right');
+    if (auditRight) {
+      const auditObs = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting) animateScoreRing();
+      }, { threshold: 0.3 });
+      auditObs.observe(auditRight);
+    }
+
+    // ── Audit form ────────────────────────────────────────────
+    document.getElementById('audit-form').addEventListener('submit', e => {
+      e.preventDefault();
+      const btn = e.target.querySelector('button');
+      const original = btn.textContent;
+      btn.textContent = 'Request sent ✓';
+      btn.style.background = 'var(--moss)';
+      setTimeout(() => { btn.textContent = original; btn.style.background = ''; e.target.reset(); }, 3000);
+    });
   </script>
 
 </body>
