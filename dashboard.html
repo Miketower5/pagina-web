@@ -4,453 +4,1020 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard — BrewStudio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --dark:        #130f0a;
+      --dark-2:      #1c1710;
+      --amber:       #c8782a;
+      --amber-hover: #e08930;
+      --cream:       #faf6f0;
+      --cream-2:     #f0e9df;
+      --moss:        #3b5a3c;
+      --terra:       #b84c33;
+      --muted:       #7a6e62;
+      --sidebar-w:   220px;
+      --topbar-h:    60px;
+      --radius:      10px;
+      --transition:  0.22s ease;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--dark);
+      color: var(--cream);
+      min-height: 100vh;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.035;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23g)'/%3E%3C/svg%3E");
+    }
+
+    /* ── LOGIN OVERLAY ───────────────────────────────────────── */
+    #login-overlay {
+      position: fixed; inset: 0; z-index: 5000;
+      background: var(--dark);
+      display: flex; align-items: center; justify-content: center;
+    }
+    #login-overlay.hidden { display: none; }
+    #login-box {
+      width: 100%; max-width: 400px;
+      background: var(--dark-2);
+      border: 1px solid rgba(200,120,42,0.2);
+      border-radius: 16px;
+      padding: 2.5rem 2rem;
+      margin: 1rem;
+    }
+    #login-logo {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 1.6rem;
+      color: var(--amber);
+      text-align: center;
+      display: block;
+      margin-bottom: 0.4rem;
+    }
+    #login-sub {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(250,246,240,0.3);
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .lfield { margin-bottom: 1.1rem; }
+    .lfield label {
+      display: block;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(250,246,240,0.4);
+      margin-bottom: 0.4rem;
+    }
+    .lfield input {
+      width: 100%;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 0.65rem 0.9rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      color: var(--cream);
+      outline: none;
+      transition: border-color var(--transition);
+    }
+    .lfield input:focus { border-color: var(--amber); }
+    #login-btn {
+      width: 100%;
+      background: var(--amber);
+      color: var(--dark);
+      border: none;
+      border-radius: 999px;
+      padding: 0.75rem;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      transition: background var(--transition);
+    }
+    #login-btn:hover { background: var(--amber-hover); }
+    #login-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    #login-err {
+      font-size: 0.82rem;
+      color: var(--terra);
+      text-align: center;
+      margin-top: 0.75rem;
+      min-height: 1.2em;
+    }
+
+    /* ── SIDEBAR ─────────────────────────────────────────────── */
+    #sidebar {
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      width: var(--sidebar-w);
+      background: var(--dark-2);
+      border-right: 1px solid rgba(200,120,42,0.1);
+      display: flex;
+      flex-direction: column;
+      z-index: 200;
+      transition: transform var(--transition);
+    }
+    #sidebar-logo {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 1.25rem;
+      color: var(--amber);
+      padding: 1.35rem 1.25rem 1rem;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    #sidebar-nav {
+      flex: 1;
+      padding: 0.75rem 0;
+      overflow-y: auto;
+    }
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.6rem 1.25rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: rgba(250,246,240,0.5);
+      text-decoration: none;
+      border-left: 2px solid transparent;
+      transition: color var(--transition), background var(--transition), border-color var(--transition);
+    }
+    .nav-link:hover { color: var(--cream); background: rgba(255,255,255,0.04); }
+    .nav-link.active { color: var(--amber); border-left-color: var(--amber); background: rgba(200,120,42,0.08); }
+    .nav-icon { font-size: 1rem; width: 1.2rem; text-align: center; }
+    #sync-indicator {
+      padding: 0.9rem 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+    #sync-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--moss);
+      flex-shrink: 0;
+      transition: background 0.3s;
+    }
+    #sync-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.08em;
+      color: rgba(250,246,240,0.3);
+    }
+
+    /* ── TOPBAR ──────────────────────────────────────────────── */
+    #topbar {
+      position: fixed;
+      top: 0;
+      left: var(--sidebar-w);
+      right: 0;
+      height: var(--topbar-h);
+      background: rgba(19,15,10,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      display: flex;
+      align-items: center;
+      padding: 0 1.5rem;
+      gap: 1rem;
+      z-index: 100;
+    }
+    #hamburger {
+      display: none;
+      background: none;
+      border: none;
+      color: rgba(250,246,240,0.6);
+      font-size: 1.3rem;
+      cursor: pointer;
+      padding: 0.2rem;
+    }
+    #page-title {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 1.15rem;
+      font-weight: 400;
+      color: var(--cream);
+      flex: 1;
+    }
+    #user-avatar {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      background: var(--amber);
+      color: var(--dark);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    /* ── MAIN ────────────────────────────────────────────────── */
+    #main-content {
+      margin-left: var(--sidebar-w);
+      padding: calc(var(--topbar-h) + 2rem) 2rem 3rem;
+      min-height: 100vh;
+    }
+
+    /* ── KPI CARDS ───────────────────────────────────────────── */
+    #kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .kpi-card {
+      background: var(--dark-2);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: var(--radius);
+      padding: 1.35rem 1.5rem;
+    }
+    .kpi-card label {
+      display: block;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(250,246,240,0.35);
+      margin-bottom: 0.5rem;
+    }
+    .kpi-number {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.9rem;
+      font-weight: 700;
+      color: var(--amber);
+    }
+
+    /* ── TABS ────────────────────────────────────────────────── */
+    #tabs-section {
+      background: var(--dark-2);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    #tab-header {
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      padding: 0 1.5rem;
+      gap: 0;
+    }
+    .tab-btn {
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      padding: 1rem 1.25rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: rgba(250,246,240,0.4);
+      cursor: pointer;
+      transition: color var(--transition), border-color var(--transition);
+      margin-bottom: -1px;
+    }
+    .tab-btn:hover { color: var(--cream); }
+    .tab-btn.active { color: var(--amber); border-bottom-color: var(--amber); }
+    #tab-actions {
+      margin-left: auto;
+      display: flex;
+      gap: 0.6rem;
+      padding: 0.5rem 0;
+    }
+    .btn-sm {
+      background: var(--amber);
+      color: var(--dark);
+      border: none;
+      border-radius: 999px;
+      padding: 0.4rem 1rem;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 600;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: background var(--transition);
+    }
+    .btn-sm:hover { background: var(--amber-hover); }
+    .btn-sm-ghost {
+      background: transparent;
+      color: rgba(250,246,240,0.5);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 999px;
+      padding: 0.4rem 1rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: color var(--transition), border-color var(--transition);
+    }
+    .btn-sm-ghost:hover { color: var(--cream); border-color: rgba(255,255,255,0.25); }
+
+    /* ── TABLE ───────────────────────────────────────────────── */
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .data-table th {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(250,246,240,0.3);
+      padding: 0.75rem 1.5rem;
+      text-align: left;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .data-table td {
+      padding: 0.8rem 1.5rem;
+      font-size: 0.875rem;
+      color: rgba(250,246,240,0.8);
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+      vertical-align: middle;
+    }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table tr:hover td { background: rgba(255,255,255,0.025); }
+    .data-table .empty-row td {
+      text-align: center;
+      padding: 3rem;
+      color: rgba(250,246,240,0.2);
+      font-style: italic;
+    }
+
+    /* badges */
+    .badge {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.22rem 0.6rem;
+      border-radius: 999px;
+      font-weight: 500;
+    }
+    .badge-new, .badge-pending  { background: rgba(200,120,42,0.18); color: var(--amber); }
+    .badge-active, .badge-paid  { background: rgba(59,90,60,0.25); color: #6dbf6f; }
+    .badge-contacted, .badge-overdue { background: rgba(184,76,51,0.2); color: #e07060; }
+    .badge-converted { background: rgba(59,90,60,0.35); color: #6dbf6f; }
+    .badge-paused   { background: rgba(122,110,98,0.2); color: var(--muted); }
+    .badge-draft    { background: rgba(122,110,98,0.2); color: var(--muted); }
+
+    /* ── MODAL ───────────────────────────────────────────────── */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 400;
+      background: rgba(0,0,0,0.65);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--transition);
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .modal-box {
+      background: var(--dark-2);
+      border: 1px solid rgba(200,120,42,0.18);
+      border-radius: 14px;
+      padding: 2rem;
+      width: 100%;
+      max-width: 480px;
+      max-height: 90vh;
+      overflow-y: auto;
+      transform: translateY(16px);
+      transition: transform var(--transition);
+      position: relative;
+    }
+    .modal-overlay.open .modal-box { transform: none; }
+    .modal-title {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 1.2rem;
+      color: var(--cream);
+      margin-bottom: 1.5rem;
+    }
+    .modal-close {
+      position: absolute;
+      top: 1rem; right: 1rem;
+      background: none;
+      border: none;
+      color: rgba(250,246,240,0.35);
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: color var(--transition);
+    }
+    .modal-close:hover { color: var(--cream); }
+    .mfield { margin-bottom: 1rem; }
+    .mfield label {
+      display: block;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.67rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(250,246,240,0.35);
+      margin-bottom: 0.35rem;
+    }
+    .mfield input, .mfield select, .mfield textarea {
+      width: 100%;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      padding: 0.6rem 0.85rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem;
+      color: var(--cream);
+      outline: none;
+      transition: border-color var(--transition);
+    }
+    .mfield input:focus, .mfield select:focus, .mfield textarea:focus { border-color: var(--amber); }
+    .mfield select option { background: var(--dark-2); }
+    .mfield textarea { resize: vertical; min-height: 70px; }
+    .modal-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+    }
+    .btn-cancel {
+      background: transparent;
+      color: rgba(250,246,240,0.5);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 999px;
+      padding: 0.55rem 1.25rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: color var(--transition);
+    }
+    .btn-cancel:hover { color: var(--cream); }
+    .btn-save {
+      background: var(--amber);
+      color: var(--dark);
+      border: none;
+      border-radius: 999px;
+      padding: 0.55rem 1.4rem;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 600;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: background var(--transition);
+    }
+    .btn-save:hover { background: var(--amber-hover); }
+    .btn-save:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    /* ── TOAST ───────────────────────────────────────────────── */
+    #toast-container {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      z-index: 3000;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .toast {
+      background: var(--dark-2);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      padding: 0.75rem 1.1rem;
+      font-size: 0.875rem;
+      color: var(--cream);
+      max-width: 300px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      animation: toast-in 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .toast.success { border-left: 3px solid #6dbf6f; }
+    .toast.error   { border-left: 3px solid var(--terra); }
+    .toast.info    { border-left: 3px solid var(--amber); }
+    @keyframes toast-in {
+      from { opacity: 0; transform: translateX(16px); }
+      to   { opacity: 1; transform: none; }
+    }
+
+    /* ── RESPONSIVE ──────────────────────────────────────────── */
+    @media (max-width: 900px) {
+      #sidebar { transform: translateX(calc(-1 * var(--sidebar-w))); }
+      #sidebar.open { transform: none; }
+      #topbar { left: 0; }
+      #main-content { margin-left: 0; padding: calc(var(--topbar-h) + 1.5rem) 1rem 3rem; }
+      #hamburger { display: block; }
+    }
+  </style>
 </head>
 <body>
+
+  <!-- LOGIN OVERLAY -->
+  <div id="login-overlay">
+    <div id="login-box">
+      <span id="login-logo">BrewStudio</span>
+      <p id="login-sub">Agency Dashboard</p>
+      <form id="login-form" novalidate>
+        <div class="lfield">
+          <label for="l-email">Email</label>
+          <input type="email" id="l-email" placeholder="you@brewstudio.co" autocomplete="username" required>
+        </div>
+        <div class="lfield">
+          <label for="l-pass">Password</label>
+          <input type="password" id="l-pass" placeholder="••••••••" autocomplete="current-password" required>
+        </div>
+        <button type="submit" id="login-btn">Sign in</button>
+        <p id="login-err"></p>
+      </form>
+    </div>
+  </div>
 
   <!-- SIDEBAR -->
   <aside id="sidebar">
     <div id="sidebar-logo">BrewStudio</div>
     <nav id="sidebar-nav">
-      <a href="dashboard.html" class="nav-link active">
-        <svg><!-- icon: grid --></svg>
-        Dashboard
-      </a>
-      <a href="clients.html" class="nav-link">
-        <svg><!-- icon: users --></svg>
-        Clients
-      </a>
-      <a href="audit-reports.html" class="nav-link">
-        <svg><!-- icon: chart --></svg>
-        Audit Reports
-      </a>
-      <a href="onboarding.html" class="nav-link">
-        <svg><!-- icon: checklist --></svg>
-        Onboarding
-      </a>
-      <a href="services.html" class="nav-link">
-        <svg><!-- icon: briefcase --></svg>
-        Services
-      </a>
-      <a href="pricing.html" class="nav-link">
-        <svg><!-- icon: dollar --></svg>
-        Pricing
-      </a>
-      <a href="settings.html" class="nav-link">
-        <svg><!-- icon: settings --></svg>
-        Settings
-      </a>
+      <a href="dashboard.html"    class="nav-link active"><span class="nav-icon">⬡</span>Dashboard</a>
+      <a href="clients.html"      class="nav-link"><span class="nav-icon">☕</span>Clients</a>
+      <a href="audit-reports.html"class="nav-link"><span class="nav-icon">📋</span>Audits</a>
+      <a href="onboarding.html"   class="nav-link"><span class="nav-icon">🚀</span>Onboarding</a>
+      <a href="services.html"     class="nav-link"><span class="nav-icon">✦</span>Services</a>
+      <a href="pricing.html"      class="nav-link"><span class="nav-icon">$</span>Pricing</a>
+      <a href="settings.html"     class="nav-link"><span class="nav-icon">⚙</span>Settings</a>
     </nav>
     <div id="sync-indicator">
       <span id="sync-dot"></span>
-      <span id="sync-label">Synced</span>
+      <span id="sync-label">—</span>
     </div>
   </aside>
 
   <!-- TOPBAR -->
   <header id="topbar">
-    <button id="hamburger">&#9776;</button>
+    <button id="hamburger" aria-label="Toggle sidebar">&#9776;</button>
     <h1 id="page-title">Dashboard</h1>
     <div id="user-avatar">BS</div>
   </header>
 
-  <!-- MAIN CONTENT -->
+  <!-- MAIN -->
   <main id="main-content">
-
-    <!-- WELCOME BAR -->
-    <div id="welcome-bar">
-      <div>
-        <h2 id="greeting">Good morning, BrewStudio</h2>
-        <p id="current-date"></p>
-      </div>
-      <div id="welcome-stats">
-        <div class="welcome-stat">
-          <span id="stat-clients">0</span>
-          <label>Active clients</label>
-        </div>
-        <div class="welcome-stat">
-          <span id="stat-mrr">$0</span>
-          <label>MRR</label>
-        </div>
-        <div class="welcome-stat">
-          <span id="stat-audits">0</span>
-          <label>Open audits</label>
-        </div>
-      </div>
-    </div>
 
     <!-- KPI CARDS -->
     <section id="kpi-grid">
       <div class="kpi-card">
-        <label>Active Clients</label>
-        <div class="kpi-number" id="kpi-clients">0</div>
-        <div class="kpi-delta positive">+2 this month</div>
+        <label>MRR</label>
+        <div class="kpi-number" id="kpi-mrr">—</div>
       </div>
       <div class="kpi-card">
-        <label>Monthly Revenue (MRR)</label>
-        <div class="kpi-number" id="kpi-mrr">$0</div>
-        <div class="kpi-delta positive">+$700</div>
+        <label>ARR</label>
+        <div class="kpi-number" id="kpi-arr">—</div>
       </div>
       <div class="kpi-card">
-        <label>Open Audits</label>
-        <div class="kpi-number" id="kpi-audits">0</div>
-        <div class="kpi-delta neutral">No change</div>
+        <label>Avg. per Client</label>
+        <div class="kpi-number" id="kpi-avg">—</div>
       </div>
       <div class="kpi-card">
-        <label>Avg. Growth</label>
-        <div class="kpi-number" id="kpi-growth">0%</div>
-        <div class="kpi-delta positive">+4%</div>
+        <label>Total Collected</label>
+        <div class="kpi-number" id="kpi-total">—</div>
       </div>
     </section>
 
-    <!-- QUICK ACCESS -->
-    <section id="quick-access">
-      <h2>Quick access</h2>
-      <div id="quick-grid">
-        <a href="clients.html" class="quick-card">
-          <svg><!-- icon: users --></svg>
-          <span>Clients</span>
-        </a>
-        <a href="audit-reports.html" class="quick-card">
-          <svg><!-- icon: chart --></svg>
-          <span>Audit Reports</span>
-        </a>
-        <a href="onboarding.html" class="quick-card">
-          <svg><!-- icon: checklist --></svg>
-          <span>Onboarding</span>
-        </a>
-        <a href="services.html" class="quick-card">
-          <svg><!-- icon: briefcase --></svg>
-          <span>Services</span>
-        </a>
-        <a href="pricing.html" class="quick-card">
-          <svg><!-- icon: dollar --></svg>
-          <span>Pricing</span>
-        </a>
-        <a href="settings.html" class="quick-card">
-          <svg><!-- icon: settings --></svg>
-          <span>Settings</span>
-        </a>
-      </div>
-    </section>
-
-    <!-- REVENUE CHART -->
-    <section id="revenue-section">
-      <h2>Revenue — last 6 months</h2>
-      <div id="chart-container">
-        <svg id="revenue-chart" viewBox="0 0 600 200">
-          <!-- Y axis labels -->
-          <text x="0" y="20" class="chart-label">$5k</text>
-          <text x="0" y="70" class="chart-label">$3k</text>
-          <text x="0" y="120" class="chart-label">$1k</text>
-          <!-- Bars rendered by JS -->
-          <g id="chart-bars"></g>
-          <!-- X axis labels -->
-          <g id="chart-months"></g>
-        </svg>
-      </div>
-    </section>
-
-    <!-- BOTTOM ROW -->
-    <div id="bottom-row">
-
-      <!-- TASK LIST -->
-      <section id="tasks-section">
-        <h2>Tasks</h2>
-        <div id="task-input-row">
-          <input type="text" id="task-input" placeholder="Add a task…">
-          <button id="task-add-btn">Add</button>
+    <!-- TABS -->
+    <section id="tabs-section">
+      <div id="tab-header">
+        <button class="tab-btn active" data-tab="leads">Leads</button>
+        <button class="tab-btn" data-tab="clients">Clients</button>
+        <button class="tab-btn" data-tab="invoices">Invoices</button>
+        <div id="tab-actions">
+          <button class="btn-sm" id="add-btn">+ Add</button>
         </div>
-        <ul id="task-list">
-          <!-- Tasks rendered by JS -->
-        </ul>
-      </section>
+      </div>
 
-      <!-- RECENT CLIENTS -->
-      <section id="recent-clients-section">
-        <h2>Recent clients</h2>
-        <ul id="recent-clients-list">
-          <!-- Rendered by JS -->
-        </ul>
-        <a href="clients.html" id="view-all-link">View all →</a>
-      </section>
+      <!-- LEADS -->
+      <div class="tab-panel active" id="panel-leads">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Café</th><th>Email</th><th>City</th><th>Status</th><th>Date</th>
+            </tr>
+          </thead>
+          <tbody id="leads-tbody"></tbody>
+        </table>
+      </div>
 
-    </div>
+      <!-- CLIENTS -->
+      <div class="tab-panel" id="panel-clients">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Name</th><th>Plan</th><th>City</th><th>Status</th><th>Followers</th>
+            </tr>
+          </thead>
+          <tbody id="clients-tbody"></tbody>
+        </table>
+      </div>
 
-    <!-- SOCIAL PERFORMANCE TABLE -->
-    <section id="performance-section">
-      <h2>Social media performance</h2>
-      <table id="performance-table">
-        <thead>
-          <tr>
-            <th data-col="client">Client</th>
-            <th data-col="platform">Platform</th>
-            <th data-col="followers">Followers</th>
-            <th data-col="posts">Posts/Month</th>
-            <th data-col="engagement">Avg. Engagement</th>
-          </tr>
-        </thead>
-        <tbody id="performance-tbody">
-          <!-- Rendered by JS -->
-        </tbody>
-      </table>
+      <!-- INVOICES -->
+      <div class="tab-panel" id="panel-invoices">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Client</th><th>Amount</th><th>Plan</th><th>Date</th><th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="invoices-tbody"></tbody>
+        </table>
+      </div>
     </section>
 
   </main>
 
+  <!-- ADD CLIENT MODAL -->
+  <div class="modal-overlay" id="modal-client">
+    <div class="modal-box">
+      <button class="modal-close" data-close="modal-client">✕</button>
+      <h2 class="modal-title">Add Client</h2>
+      <form id="client-form" novalidate>
+        <div class="modal-row">
+          <div class="mfield">
+            <label>Name *</label>
+            <input type="text" id="cf-name" required placeholder="Bloom Roasters">
+          </div>
+          <div class="mfield">
+            <label>Email</label>
+            <input type="email" id="cf-email" placeholder="hello@bloom.co">
+          </div>
+        </div>
+        <div class="modal-row">
+          <div class="mfield">
+            <label>Plan</label>
+            <select id="cf-plan">
+              <option value="Starter">Starter</option>
+              <option value="Growth" selected>Growth</option>
+              <option value="Full Brand">Full Brand</option>
+            </select>
+          </div>
+          <div class="mfield">
+            <label>Status</label>
+            <select id="cf-status">
+              <option value="active">Active</option>
+              <option value="pending">Pending</option>
+              <option value="paused">Paused</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-row">
+          <div class="mfield">
+            <label>City</label>
+            <input type="text" id="cf-city" placeholder="Buenos Aires">
+          </div>
+          <div class="mfield">
+            <label>Instagram</label>
+            <input type="text" id="cf-ig" placeholder="@bloomroasters">
+          </div>
+        </div>
+        <div class="modal-row">
+          <div class="mfield">
+            <label>Followers</label>
+            <input type="number" id="cf-followers" min="0" placeholder="4200">
+          </div>
+          <div class="mfield">
+            <label>Engagement %</label>
+            <input type="number" id="cf-engagement" min="0" step="0.1" placeholder="3.5">
+          </div>
+        </div>
+        <div class="mfield">
+          <label>Notes</label>
+          <textarea id="cf-notes" placeholder="Any relevant context…"></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" data-close="modal-client">Cancel</button>
+          <button type="submit" class="btn-save" id="client-save-btn">Save client</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ADD LEAD MODAL -->
+  <div class="modal-overlay" id="modal-lead">
+    <div class="modal-box">
+      <button class="modal-close" data-close="modal-lead">✕</button>
+      <h2 class="modal-title">Add Lead</h2>
+      <form id="lead-form" novalidate>
+        <div class="modal-row">
+          <div class="mfield">
+            <label>Café name *</label>
+            <input type="text" id="lf-cafe" required placeholder="Black Bear Coffee">
+          </div>
+          <div class="mfield">
+            <label>Email *</label>
+            <input type="email" id="lf-email" required placeholder="hello@blackbear.co">
+          </div>
+        </div>
+        <div class="modal-row">
+          <div class="mfield">
+            <label>Instagram</label>
+            <input type="text" id="lf-ig" placeholder="@blackbearcoffee">
+          </div>
+          <div class="mfield">
+            <label>City</label>
+            <input type="text" id="lf-city" placeholder="Buenos Aires">
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" data-close="modal-lead">Cancel</button>
+          <button type="submit" class="btn-save" id="lead-save-btn">Save lead</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOAST CONTAINER -->
+  <div id="toast-container"></div>
+
   <script>
-    // ── Greeting ──────────────────────────────────────────────
-    (function setGreeting() {
-      const hour = new Date().getHours();
-      const greet = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
-      document.getElementById('greeting').textContent = `${greet}, BrewStudio`;
-      document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-GB', {
-        weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
-      });
-    })();
+    const API = 'https://brewstudio-backend-production.up.railway.app';
 
-    // ── localStorage helpers ──────────────────────────────────
-    function getData(key, fallback = []) {
-      try { return JSON.parse(localStorage.getItem('brewstudio_' + key)) || fallback; }
-      catch { return fallback; }
+    // ── Auth helpers ───────────────────────────────────────────
+    function getToken() { return localStorage.getItem('bs_token'); }
+    function authHeaders() {
+      return { 'Authorization': `Bearer ${getToken()}`, 'Content-Type': 'application/json' };
     }
-    function saveData(key, value) {
-      localStorage.setItem('brewstudio_' + key, JSON.stringify(value));
-      scheduleSync();
+    function handleUnauth() {
+      localStorage.removeItem('bs_token');
+      document.getElementById('login-overlay').classList.remove('hidden');
     }
 
-    // ── KPIs ─────────────────────────────────────────────────
-    function renderKPIs() {
-      const clients = getData('clients');
-      const invoices = getData('invoices');
-      const audits = getData('audits');
-
-      const active = clients.filter(c => c.status === 'Active').length;
-      const mrr = invoices
-        .filter(i => i.status === 'Paid' && isThisMonth(i.date))
-        .reduce((sum, i) => sum + Number(i.amount || 0), 0);
-      const openAudits = audits.filter(a => a.status === 'Draft').length;
-
-      document.getElementById('kpi-clients').textContent = active;
-      document.getElementById('kpi-mrr').textContent = '$' + mrr.toLocaleString();
-      document.getElementById('kpi-audits').textContent = openAudits;
-      document.getElementById('stat-clients').textContent = active;
-      document.getElementById('stat-mrr').textContent = '$' + mrr.toLocaleString();
-      document.getElementById('stat-audits').textContent = openAudits;
+    // ── Toast ──────────────────────────────────────────────────
+    function toast(msg, type = 'info') {
+      const el = document.createElement('div');
+      el.className = `toast ${type}`;
+      el.textContent = msg;
+      document.getElementById('toast-container').appendChild(el);
+      setTimeout(() => el.remove(), 3500);
     }
 
-    function isThisMonth(dateStr) {
-      const d = new Date(dateStr), now = new Date();
-      return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
-    }
-
-    // ── Revenue chart (SVG) ───────────────────────────────────
-    function renderChart() {
-      const invoices = getData('invoices');
-      const months = [];
-      for (let i = 5; i >= 0; i--) {
-        const d = new Date();
-        d.setMonth(d.getMonth() - i);
-        months.push({ label: d.toLocaleString('en', { month: 'short' }), year: d.getFullYear(), month: d.getMonth() });
-      }
-      const totals = months.map(m =>
-        invoices.filter(inv => {
-          const d = new Date(inv.date);
-          return d.getMonth() === m.month && d.getFullYear() === m.year && inv.status === 'Paid';
-        }).reduce((s, inv) => s + Number(inv.amount || 0), 0)
-      );
-      const max = Math.max(...totals, 1000);
-      const barsEl = document.getElementById('chart-bars');
-      const monthsEl = document.getElementById('chart-months');
-      const barW = 60, gap = 40, startX = 50, chartH = 150;
-      barsEl.innerHTML = '';
-      monthsEl.innerHTML = '';
-      totals.forEach((val, i) => {
-        const h = Math.max((val / max) * chartH, 4);
-        const x = startX + i * (barW + gap);
-        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-        rect.setAttribute('x', x);
-        rect.setAttribute('y', chartH - h + 10);
-        rect.setAttribute('width', barW);
-        rect.setAttribute('height', h);
-        rect.setAttribute('fill', '#C8782A');
-        rect.setAttribute('rx', '4');
-        barsEl.appendChild(rect);
-        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        text.setAttribute('x', x + barW / 2);
-        text.setAttribute('y', 175);
-        text.setAttribute('text-anchor', 'middle');
-        text.setAttribute('class', 'chart-label');
-        text.textContent = months[i].label;
-        monthsEl.appendChild(text);
-      });
-    }
-
-    // ── Tasks ─────────────────────────────────────────────────
-    function renderTasks() {
-      const tasks = getData('tasks');
-      const list = document.getElementById('task-list');
-      list.innerHTML = '';
-      tasks.forEach((task, i) => {
-        const li = document.createElement('li');
-        li.innerHTML = `
-          <input type="checkbox" ${task.done ? 'checked' : ''} data-i="${i}">
-          <span style="${task.done ? 'text-decoration:line-through;opacity:.5' : ''}">${task.text}</span>
-          <button data-del="${i}">✕</button>
-        `;
-        list.appendChild(li);
-      });
-    }
-
-    document.getElementById('task-add-btn').addEventListener('click', () => {
-      const input = document.getElementById('task-input');
-      const text = input.value.trim();
-      if (!text) return;
-      const tasks = getData('tasks');
-      tasks.push({ text, done: false });
-      saveData('tasks', tasks);
-      input.value = '';
-      renderTasks();
-    });
-
-    document.getElementById('task-list').addEventListener('click', e => {
-      const tasks = getData('tasks');
-      if (e.target.dataset.del !== undefined) {
-        tasks.splice(Number(e.target.dataset.del), 1);
-      } else if (e.target.type === 'checkbox') {
-        tasks[Number(e.target.dataset.i)].done = e.target.checked;
-      }
-      saveData('tasks', tasks);
-      renderTasks();
-    });
-
-    // ── Recent clients ────────────────────────────────────────
-    function renderRecentClients() {
-      const clients = getData('clients').slice(-5).reverse();
-      const list = document.getElementById('recent-clients-list');
-      list.innerHTML = '';
-      if (!clients.length) {
-        list.innerHTML = '<li>No clients yet.</li>';
-        return;
-      }
-      clients.forEach(c => {
-        const li = document.createElement('li');
-        li.innerHTML = `
-          <strong>${c.name}</strong>
-          <span>${c.city}</span>
-          <span>${c.plan}</span>
-          <span class="status-badge status-${(c.status || '').toLowerCase()}">${c.status}</span>
-        `;
-        list.appendChild(li);
-      });
-    }
-
-    // ── Performance table ─────────────────────────────────────
-    function renderPerformance() {
-      const clients = getData('clients');
-      const tbody = document.getElementById('performance-tbody');
-      tbody.innerHTML = '';
-      if (!clients.length) {
-        tbody.innerHTML = '<tr><td colspan="5">No data yet.</td></tr>';
-        return;
-      }
-      clients.forEach(c => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${c.name || '—'}</td>
-          <td>Instagram</td>
-          <td>${c.followers || '—'}</td>
-          <td>${c.postsPerMonth || '—'}</td>
-          <td>${c.engagement || '—'}</td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    // Table sort
-    document.querySelectorAll('#performance-table th').forEach(th => {
-      th.style.cursor = 'pointer';
-      th.addEventListener('click', () => {
-        const col = th.dataset.col;
-        const clients = getData('clients').sort((a, b) =>
-          String(a[col] || '').localeCompare(String(b[col] || ''))
-        );
-        saveData('clients', clients);
-        renderPerformance();
-      });
-    });
-
-    // ── Cloud Sync ────────────────────────────────────────────
-    const SYNC_CONFIG = {
-      get binId() { return localStorage.getItem('brewstudio_bin_id'); },
-      get apiKey() { return localStorage.getItem('brewstudio_api_key'); }
-    };
-    const SYNC_KEYS = ['clients', 'tasks', 'audits', 'invoices', 'settings', 'checklist'];
-
-    let syncTimeout;
-    function scheduleSync() {
-      clearTimeout(syncTimeout);
-      syncTimeout = setTimeout(pushToCloud, 2000);
-    }
-
-    function updateSyncStatus(status) {
-      const dot = document.getElementById('sync-dot');
-      const label = document.getElementById('sync-label');
-      const colors = { synced: '#3D5A3E', syncing: '#D4A843', error: '#C4553A' };
-      const labels = { synced: 'Synced', syncing: 'Syncing…', error: 'Offline' };
-      dot.style.backgroundColor = colors[status] || colors.synced;
-      label.textContent = labels[status] || 'Synced';
-    }
-
-    async function pushToCloud() {
-      if (!SYNC_CONFIG.binId || !SYNC_CONFIG.apiKey) return;
-      updateSyncStatus('syncing');
-      const payload = {};
-      SYNC_KEYS.forEach(k => { payload[k] = getData(k); });
+    // ── Login ──────────────────────────────────────────────────
+    document.getElementById('login-form').addEventListener('submit', async e => {
+      e.preventDefault();
+      const btn = document.getElementById('login-btn');
+      const err = document.getElementById('login-err');
+      const email = document.getElementById('l-email').value.trim();
+      const pass  = document.getElementById('l-pass').value;
+      btn.disabled = true;
+      btn.textContent = 'Signing in…';
+      err.textContent = '';
       try {
-        await fetch(`https://api.jsonbin.io/v3/b/${SYNC_CONFIG.binId}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json', 'X-Master-Key': SYNC_CONFIG.apiKey },
-          body: JSON.stringify(payload)
+        const body = new URLSearchParams();
+        body.append('username', email);
+        body.append('password', pass);
+        const res = await fetch(`${API}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body
         });
-        localStorage.setItem('brewstudio_last_sync', Date.now());
-        updateSyncStatus('synced');
-      } catch { updateSyncStatus('error'); }
+        if (!res.ok) { err.textContent = 'Invalid credentials.'; return; }
+        const { access_token } = await res.json();
+        localStorage.setItem('bs_token', access_token);
+        document.getElementById('login-overlay').classList.add('hidden');
+        initDashboard();
+      } catch {
+        err.textContent = 'Network error.';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Sign in';
+      }
+    });
+
+    // ── Sync indicator ─────────────────────────────────────────
+    const SYNC_COLORS = { synced: '#3b5a3c', syncing: '#c8782a', error: '#b84c33' };
+    const SYNC_LABELS = { synced: 'Synced', syncing: 'Syncing…', error: 'Offline' };
+    function setSyncStatus(s) {
+      document.getElementById('sync-dot').style.backgroundColor = SYNC_COLORS[s];
+      document.getElementById('sync-label').textContent = SYNC_LABELS[s];
     }
 
-    async function pullFromCloud() {
-      if (!SYNC_CONFIG.binId || !SYNC_CONFIG.apiKey) return;
-      updateSyncStatus('syncing');
+    // ── Render helpers ─────────────────────────────────────────
+    function fmtMoney(v) {
+      const n = Number(v);
+      return isNaN(n) ? '—' : '$' + n.toLocaleString();
+    }
+    function fmtDate(s) {
+      if (!s) return '—';
+      return new Date(s).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+    function badge(val) {
+      const cls = (val || '').toLowerCase().replace(/\s+/g, '-');
+      return `<span class="badge badge-${cls}">${val || '—'}</span>`;
+    }
+    function emptyRow(cols, msg = 'No data yet.') {
+      return `<tr class="empty-row"><td colspan="${cols}">${msg}</td></tr>`;
+    }
+
+    // ── Load KPIs ──────────────────────────────────────────────
+    async function loadStats() {
       try {
-        const res = await fetch(`https://api.jsonbin.io/v3/b/${SYNC_CONFIG.binId}/latest`, {
-          headers: { 'X-Master-Key': SYNC_CONFIG.apiKey }
-        });
-        const json = await res.json();
-        const data = json.record || {};
-        SYNC_KEYS.forEach(k => { if (data[k]) localStorage.setItem('brewstudio_' + k, JSON.stringify(data[k])); });
-        localStorage.setItem('brewstudio_last_sync', Date.now());
-        updateSyncStatus('synced');
-      } catch { updateSyncStatus('error'); }
+        const res = await fetch(`${API}/stats`, { headers: authHeaders() });
+        if (res.status === 401) { handleUnauth(); return; }
+        if (!res.ok) return;
+        const s = await res.json();
+        document.getElementById('kpi-mrr').textContent   = fmtMoney(s.mrr ?? s.MRR ?? 0);
+        document.getElementById('kpi-arr').textContent   = fmtMoney(s.arr ?? s.ARR ?? 0);
+        document.getElementById('kpi-avg').textContent   = fmtMoney(s.avg_per_client ?? s.avg ?? 0);
+        document.getElementById('kpi-total').textContent = fmtMoney(s.total_collected ?? s.total ?? 0);
+        setSyncStatus('synced');
+      } catch { setSyncStatus('error'); }
     }
 
-    async function autoSync() {
-      const lastSync = localStorage.getItem('brewstudio_last_sync');
-      const thirtyMin = 30 * 60 * 1000;
-      if (!lastSync || Date.now() - parseInt(lastSync) > thirtyMin) await pullFromCloud();
+    // ── Load Leads ─────────────────────────────────────────────
+    async function loadLeads() {
+      const tbody = document.getElementById('leads-tbody');
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:2rem;color:rgba(250,246,240,0.25)">Loading…</td></tr>';
+      try {
+        const res = await fetch(`${API}/leads/`, { headers: authHeaders() });
+        if (res.status === 401) { handleUnauth(); return; }
+        const data = await res.json();
+        const rows = Array.isArray(data) ? data : (data.items || data.leads || []);
+        if (!rows.length) { tbody.innerHTML = emptyRow(5, 'No leads yet.'); return; }
+        tbody.innerHTML = rows.map(l => `
+          <tr>
+            <td>${l.cafe_name || '—'}</td>
+            <td>${l.email || '—'}</td>
+            <td>${l.city || '—'}</td>
+            <td>${badge(l.status)}</td>
+            <td>${fmtDate(l.created_at)}</td>
+          </tr>`).join('');
+      } catch { tbody.innerHTML = emptyRow(5, 'Failed to load leads.'); }
     }
 
-    // ── Mobile sidebar ────────────────────────────────────────
+    // ── Load Clients ───────────────────────────────────────────
+    async function loadClients() {
+      const tbody = document.getElementById('clients-tbody');
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:2rem;color:rgba(250,246,240,0.25)">Loading…</td></tr>';
+      try {
+        const res = await fetch(`${API}/clients/`, { headers: authHeaders() });
+        if (res.status === 401) { handleUnauth(); return; }
+        const data = await res.json();
+        const rows = Array.isArray(data) ? data : (data.items || data.clients || []);
+        if (!rows.length) { tbody.innerHTML = emptyRow(5, 'No clients yet.'); return; }
+        tbody.innerHTML = rows.map(c => `
+          <tr>
+            <td>${c.name || '—'}</td>
+            <td>${badge(c.plan)}</td>
+            <td>${c.city || '—'}</td>
+            <td>${badge(c.status)}</td>
+            <td>${c.followers ? Number(c.followers).toLocaleString() : '—'}</td>
+          </tr>`).join('');
+      } catch { tbody.innerHTML = emptyRow(5, 'Failed to load clients.'); }
+    }
+
+    // ── Load Invoices ──────────────────────────────────────────
+    async function loadInvoices() {
+      const tbody = document.getElementById('invoices-tbody');
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:2rem;color:rgba(250,246,240,0.25)">Loading…</td></tr>';
+      try {
+        const res = await fetch(`${API}/invoices/`, { headers: authHeaders() });
+        if (res.status === 401) { handleUnauth(); return; }
+        const data = await res.json();
+        const rows = Array.isArray(data) ? data : (data.items || data.invoices || []);
+        if (!rows.length) { tbody.innerHTML = emptyRow(5, 'No invoices yet.'); return; }
+        tbody.innerHTML = rows.map(i => `
+          <tr>
+            <td>${i.client_name || '—'}</td>
+            <td>${fmtMoney(i.amount)}</td>
+            <td>${i.plan || '—'}</td>
+            <td>${fmtDate(i.invoice_date || i.date)}</td>
+            <td>${badge(i.status)}</td>
+          </tr>`).join('');
+      } catch { tbody.innerHTML = emptyRow(5, 'Failed to load invoices.'); }
+    }
+
+    // ── Tabs ───────────────────────────────────────────────────
+    let activeTab = 'leads';
+    const tabLoaders = { leads: loadLeads, clients: loadClients, invoices: loadInvoices };
+    const tabModals  = { leads: 'modal-lead', clients: 'modal-client', invoices: null };
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        activeTab = btn.dataset.tab;
+        document.getElementById(`panel-${activeTab}`).classList.add('active');
+        tabLoaders[activeTab]?.();
+      });
+    });
+
+    document.getElementById('add-btn').addEventListener('click', () => {
+      const mid = tabModals[activeTab];
+      if (mid) openModal(mid);
+    });
+
+    // ── Modal helpers ──────────────────────────────────────────
+    function openModal(id) {
+      document.getElementById(id).classList.add('open');
+    }
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('open');
+    }
+    document.querySelectorAll('[data-close]').forEach(el => {
+      el.addEventListener('click', () => closeModal(el.dataset.close));
+    });
+    document.querySelectorAll('.modal-overlay').forEach(ov => {
+      ov.addEventListener('click', e => { if (e.target === ov) closeModal(ov.id); });
+    });
+
+    // ── Save Client ────────────────────────────────────────────
+    document.getElementById('client-form').addEventListener('submit', async e => {
+      e.preventDefault();
+      const btn = document.getElementById('client-save-btn');
+      btn.disabled = true;
+      btn.textContent = 'Saving…';
+      const payload = {
+        name:        document.getElementById('cf-name').value.trim(),
+        email:       document.getElementById('cf-email').value.trim() || undefined,
+        plan:        document.getElementById('cf-plan').value,
+        status:      document.getElementById('cf-status').value,
+        city:        document.getElementById('cf-city').value.trim() || undefined,
+        instagram:   document.getElementById('cf-ig').value.trim() || undefined,
+        followers:   parseInt(document.getElementById('cf-followers').value) || undefined,
+        engagement:  parseFloat(document.getElementById('cf-engagement').value) || undefined,
+        notes:       document.getElementById('cf-notes').value.trim() || undefined,
+      };
+      if (!payload.name) { toast('Name is required.', 'error'); btn.disabled = false; btn.textContent = 'Save client'; return; }
+      try {
+        const res = await fetch(`${API}/clients/`, { method: 'POST', headers: authHeaders(), body: JSON.stringify(payload) });
+        if (res.status === 401) { handleUnauth(); return; }
+        if (!res.ok) { const e = await res.json().catch(() => ({})); toast(e.detail || 'Failed to save client.', 'error'); return; }
+        toast('Client added!', 'success');
+        closeModal('modal-client');
+        document.getElementById('client-form').reset();
+        loadClients();
+        loadStats();
+      } catch { toast('Network error.', 'error'); }
+      finally { btn.disabled = false; btn.textContent = 'Save client'; }
+    });
+
+    // ── Save Lead ──────────────────────────────────────────────
+    document.getElementById('lead-form').addEventListener('submit', async e => {
+      e.preventDefault();
+      const btn = document.getElementById('lead-save-btn');
+      btn.disabled = true;
+      btn.textContent = 'Saving…';
+      const payload = {
+        cafe_name:  document.getElementById('lf-cafe').value.trim(),
+        email:      document.getElementById('lf-email').value.trim(),
+        instagram:  document.getElementById('lf-ig').value.trim() || undefined,
+        city:       document.getElementById('lf-city').value.trim() || undefined,
+      };
+      if (!payload.cafe_name || !payload.email) { toast('Café name and email are required.', 'error'); btn.disabled = false; btn.textContent = 'Save lead'; return; }
+      try {
+        const res = await fetch(`${API}/leads/`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        if (!res.ok) { const e = await res.json().catch(() => ({})); toast(e.detail || 'Failed to save lead.', 'error'); return; }
+        toast('Lead added!', 'success');
+        closeModal('modal-lead');
+        document.getElementById('lead-form').reset();
+        loadLeads();
+      } catch { toast('Network error.', 'error'); }
+      finally { btn.disabled = false; btn.textContent = 'Save lead'; }
+    });
+
+    // ── Hamburger ──────────────────────────────────────────────
     document.getElementById('hamburger').addEventListener('click', () => {
       document.getElementById('sidebar').classList.toggle('open');
     });
 
-    // ── Init ──────────────────────────────────────────────────
-    autoSync().then(() => {
-      renderKPIs();
-      renderChart();
-      renderTasks();
-      renderRecentClients();
-      renderPerformance();
-    });
+    // ── Init ───────────────────────────────────────────────────
+    async function initDashboard() {
+      setSyncStatus('syncing');
+      try {
+        const res = await fetch(`${API}/auth/me`, { headers: authHeaders() });
+        if (res.status === 401) { handleUnauth(); return; }
+        const me = await res.json();
+        document.getElementById('user-avatar').textContent =
+          (me.email || me.username || 'BS').slice(0, 2).toUpperCase();
+      } catch { /* non-fatal */ }
+      loadStats();
+      loadLeads();
+    }
+
+    if (getToken()) {
+      document.getElementById('login-overlay').classList.add('hidden');
+      initDashboard();
+    }
   </script>
 
 </body>
