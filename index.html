@@ -3,758 +3,587 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BrewStudio — Specialty Coffee Marketing</title>
+  <title>BrewStudio — Coffee Marketing Agency</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    /* ── Reset & Variables ───────────────────────────────────── */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --bg:        #0f0d0b;
-      --bg-card:   #1a1714;
-      --bg-card2:  #221e1a;
-      --border:    #2e2822;
-      --text:      #f5f0e8;
-      --muted:     #9a8e81;
-      --amber:     #D4A843;
-      --amber-dim: #a07e2e;
-      --moss:      #7B9E5A;
-      --sky:       #5BA4CF;
-      --terra:     #C4553A;
-      --gold:      #E8C547;
-      --dark-card: #2a2420;
-      --radius:    12px;
-      --transition: 0.25s ease;
+      --dark:        #130f0a;
+      --dark-2:      #1c1710;
+      --amber:       #c8782a;
+      --amber-hover: #e08930;
+      --cream:       #faf6f0;
+      --cream-2:     #f0e9df;
+      --moss:        #3b5a3c;
+      --terra:       #b84c33;
+      --muted:       #7a6e62;
+      --radius:      12px;
+      --transition:  0.25s ease;
     }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     html { scroll-behavior: smooth; }
 
     body {
-      font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
-      background: var(--bg);
-      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      color: var(--dark);
       overflow-x: hidden;
-      cursor: none;
     }
 
-    a { text-decoration: none; color: inherit; }
-    ul { list-style: none; }
-
-    /* ── Custom Cursor ───────────────────────────────────────── */
-    #cursor {
+    body::after {
+      content: '';
       position: fixed;
-      width: 12px; height: 12px;
-      background: var(--amber);
-      border-radius: 50%;
+      inset: 0;
       pointer-events: none;
       z-index: 9999;
-      transform: translate(-50%, -50%);
-      transition: transform 0.1s ease, width 0.2s ease, height 0.2s ease, opacity 0.2s ease;
-      mix-blend-mode: screen;
-    }
-    #cursor.hovering {
-      width: 36px; height: 36px;
-      background: rgba(212, 168, 67, 0.3);
-      border: 2px solid var(--amber);
+      opacity: 0.04;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23grain)' opacity='1'/%3E%3C/svg%3E");
     }
 
-    /* ── Navbar ──────────────────────────────────────────────── */
-    #navbar {
+    /* ── NAV ─────────────────────────────────────────────────── */
+    #nav {
       position: fixed;
       top: 0; left: 0; right: 0;
-      z-index: 100;
+      z-index: 1000;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 1.25rem 2.5rem;
-      transition: background var(--transition), padding var(--transition), box-shadow var(--transition);
+      padding: 0 5vw;
+      height: 64px;
+      background: rgba(19,15,10,0.92);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(200,120,42,0.12);
     }
-    #navbar.scrolled {
-      background: rgba(15, 13, 11, 0.96);
-      backdrop-filter: blur(12px);
-      padding: 0.9rem 2.5rem;
-      box-shadow: 0 1px 0 var(--border);
-    }
-
-    #logo {
-      font-size: 1.3rem;
-      font-weight: 700;
-      letter-spacing: -0.02em;
+    #nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 1.35rem;
       color: var(--amber);
+      letter-spacing: 0.01em;
+      text-decoration: none;
     }
-
-    #navbar > ul {
+    #nav-links {
       display: flex;
-      gap: 2.2rem;
-    }
-    #navbar > ul a {
-      font-size: 0.9rem;
-      color: var(--muted);
-      transition: color var(--transition);
-    }
-    #navbar > ul a:hover { color: var(--text); }
-
-    #navbar > div {
-      display: flex;
-      gap: 0.75rem;
       align-items: center;
+      gap: 2rem;
+      list-style: none;
     }
-    #navbar > div a:first-child {
+    #nav-links a {
       font-size: 0.875rem;
-      color: var(--muted);
+      font-weight: 500;
+      color: rgba(250,246,240,0.7);
+      text-decoration: none;
       transition: color var(--transition);
     }
-    #navbar > div a:first-child:hover { color: var(--text); }
-    #navbar > div a:last-child {
-      font-size: 0.875rem;
+    #nav-links a:hover { color: var(--cream); }
+    .nav-cta {
       background: var(--amber);
-      color: #0f0d0b;
-      font-weight: 600;
-      padding: 0.5rem 1.1rem;
-      border-radius: 6px;
-      transition: background var(--transition), transform var(--transition);
+      color: var(--dark) !important;
+      padding: 0.45rem 1.1rem;
+      border-radius: 999px;
+      font-weight: 600 !important;
+      transition: background var(--transition) !important;
     }
-    #navbar > div a:last-child:hover {
-      background: var(--gold);
-      transform: translateY(-1px);
+    .nav-cta:hover { background: var(--amber-hover) !important; color: var(--dark) !important; }
+    .nav-dashboard {
+      border: 1px solid rgba(200,120,42,0.4);
+      padding: 0.4rem 1rem;
+      border-radius: 999px;
+      color: var(--amber) !important;
+      font-weight: 500 !important;
+      transition: border-color var(--transition), background var(--transition) !important;
     }
-
-    #hamburger {
+    .nav-dashboard:hover { border-color: var(--amber); background: rgba(200,120,42,0.08) !important; }
+    #nav-hamburger {
       display: none;
       background: none;
       border: none;
-      color: var(--text);
+      cursor: pointer;
+      color: var(--cream);
       font-size: 1.4rem;
-      cursor: none;
+    }
+    @media (max-width: 720px) {
+      #nav-links { display: none; }
+      #nav-hamburger { display: block; }
+      #nav-links.open {
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        top: 64px; left: 0; right: 0;
+        background: var(--dark);
+        padding: 1.5rem 2rem;
+        gap: 1.25rem;
+        border-bottom: 1px solid rgba(200,120,42,0.15);
+      }
     }
 
-    /* Mobile nav overlay */
-    #mobile-nav {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(15, 13, 11, 0.98);
-      z-index: 99;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 2rem;
-    }
-    #mobile-nav.open { display: flex; }
-    #mobile-nav a {
-      font-size: 1.5rem;
-      font-weight: 600;
-      color: var(--muted);
-      transition: color var(--transition);
-    }
-    #mobile-nav a:hover { color: var(--amber); }
-    #mobile-close {
-      position: absolute;
-      top: 1.5rem; right: 2rem;
-      background: none; border: none;
-      color: var(--muted); font-size: 1.6rem;
-      cursor: none;
-    }
-
-    /* ── Hero ────────────────────────────────────────────────── */
+    /* ── HERO ────────────────────────────────────────────────── */
     #hero {
       position: relative;
       min-height: 100vh;
+      background: var(--dark);
       display: flex;
-      flex-direction: column;
       align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 8rem 1.5rem 4rem;
       overflow: hidden;
     }
-
-    #particles {
+    #hero-canvas {
       position: absolute;
       inset: 0;
-      pointer-events: none;
+      width: 100%;
+      height: 100%;
     }
-
     #hero-content {
       position: relative;
-      z-index: 1;
-      max-width: 720px;
+      z-index: 2;
+      max-width: 680px;
+      padding: 8rem 5vw 5rem;
     }
-    #hero-content h1 {
-      font-size: clamp(2.4rem, 6vw, 4.2rem);
-      font-weight: 800;
-      letter-spacing: -0.04em;
-      line-height: 1.08;
+    .hero-eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--amber);
       margin-bottom: 1.25rem;
     }
-    #hero-content h1 span { color: var(--amber); }
-    #hero-content p {
-      font-size: clamp(1rem, 2vw, 1.2rem);
-      color: var(--muted);
-      line-height: 1.7;
-      margin-bottom: 2.25rem;
-      max-width: 540px;
-      margin-left: auto;
-      margin-right: auto;
+    #hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: clamp(2.6rem, 6vw, 4.2rem);
+      line-height: 1.12;
+      color: var(--cream);
+      margin-bottom: 1.5rem;
     }
-    #hero-content a {
-      display: inline-block;
-      background: var(--amber);
-      color: #0f0d0b;
-      font-weight: 700;
-      font-size: 1rem;
-      padding: 0.85rem 2rem;
-      border-radius: 8px;
-      transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
-      box-shadow: 0 4px 24px rgba(212, 168, 67, 0.25);
-    }
-    #hero-content a:hover {
-      background: var(--gold);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 32px rgba(212, 168, 67, 0.4);
-    }
-
-    #hero-stats {
-      position: relative;
-      z-index: 1;
-      display: flex;
-      gap: 3rem;
-      margin-top: 4.5rem;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-    .stat {
-      text-align: center;
-    }
-    .stat-value {
-      font-size: 2.4rem;
-      font-weight: 800;
+    #hero h1 em {
+      font-style: normal;
       color: var(--amber);
-      letter-spacing: -0.04em;
-      line-height: 1;
     }
-    .stat p {
-      font-size: 0.82rem;
-      color: var(--muted);
-      margin-top: 0.35rem;
+    .hero-sub {
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: rgba(250,246,240,0.65);
+      max-width: 480px;
+      margin-bottom: 2.5rem;
+    }
+    .hero-actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .btn-primary {
+      background: var(--amber);
+      color: var(--dark);
+      border: none;
+      padding: 0.75rem 1.75rem;
+      border-radius: 999px;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: background var(--transition), transform 0.15s;
+    }
+    .btn-primary:hover { background: var(--amber-hover); transform: translateY(-1px); }
+    .btn-ghost {
+      background: transparent;
+      color: var(--cream);
+      border: 1px solid rgba(250,246,240,0.25);
+      padding: 0.75rem 1.75rem;
+      border-radius: 999px;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 500;
+      font-size: 0.95rem;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      transition: border-color var(--transition), background var(--transition);
+    }
+    .btn-ghost:hover { border-color: rgba(250,246,240,0.5); background: rgba(250,246,240,0.06); }
+
+    /* Hero stats */
+    #hero-stats {
+      position: absolute;
+      bottom: 3rem;
+      right: 5vw;
+      display: flex;
+      gap: 2.5rem;
+      z-index: 2;
+    }
+    .hero-stat { text-align: center; }
+    .hero-stat-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--amber);
+      display: block;
+    }
+    .hero-stat-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      color: rgba(250,246,240,0.45);
+    }
+    @media (max-width: 720px) {
+      #hero-stats { position: static; margin-top: 2.5rem; justify-content: flex-start; }
     }
 
-    /* ── Ticker ──────────────────────────────────────────────── */
+    /* ── TICKER ───────────────────────────────────────────────── */
     #ticker {
+      background: var(--amber);
       overflow: hidden;
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      padding: 0.85rem 0;
-      background: var(--bg-card);
+      padding: 0.6rem 0;
     }
     #ticker-track {
       display: flex;
-      gap: 0;
       white-space: nowrap;
-      animation: ticker 28s linear infinite;
-      width: max-content;
+      animation: ticker-scroll 28s linear infinite;
     }
-    #ticker-track span {
-      font-size: 0.8rem;
+    .ticker-item {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--dark);
+      padding: 0 2.5rem;
+      flex-shrink: 0;
+    }
+    .ticker-dot { color: rgba(19,15,10,0.4); }
+    @keyframes ticker-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    /* ── SECTION COMMON ──────────────────────────────────────── */
+    .section { padding: 7rem 5vw; }
+    .section-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 0.75rem;
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: clamp(1.9rem, 4vw, 2.8rem);
+      line-height: 1.2;
+      color: var(--dark);
+      margin-bottom: 1rem;
+    }
+    .section-sub {
+      font-size: 1rem;
+      line-height: 1.7;
       color: var(--muted);
-      letter-spacing: 0.06em;
-      padding-right: 0;
-    }
-    @keyframes ticker {
-      from { transform: translateX(0); }
-      to { transform: translateX(-50%); }
+      max-width: 540px;
+      margin-bottom: 3.5rem;
     }
 
-    /* ── Section shared ──────────────────────────────────────── */
-    section {
-      padding: 6rem 1.5rem;
-      max-width: 1100px;
-      margin: 0 auto;
-    }
-    section h2 {
-      font-size: clamp(1.8rem, 4vw, 2.6rem);
-      font-weight: 800;
-      letter-spacing: -0.03em;
-      margin-bottom: 3rem;
-      text-align: center;
-    }
-
-    /* Reveal animation */
     .reveal {
       opacity: 0;
       transform: translateY(28px);
-      transition: opacity 0.6s ease, transform 0.6s ease;
+      transition: opacity 0.65s ease, transform 0.65s ease;
     }
-    .reveal.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    .reveal-delay-1 { transition-delay: 0.1s; }
-    .reveal-delay-2 { transition-delay: 0.2s; }
-    .reveal-delay-3 { transition-delay: 0.3s; }
-    .reveal-delay-4 { transition-delay: 0.4s; }
-    .reveal-delay-5 { transition-delay: 0.5s; }
-    .reveal-delay-6 { transition-delay: 0.6s; }
+    .reveal.visible { opacity: 1; transform: none; }
 
-    /* ── Services ────────────────────────────────────────────── */
+    /* ── SERVICES ─────────────────────────────────────────────── */
+    #services { background: var(--cream-2); }
     #services-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1.25rem;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
     }
     .service-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.75rem;
-      transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
-      cursor: default;
-    }
-    .service-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 40px rgba(0,0,0,0.4);
-    }
-    .service-card[data-color="sky"]:hover  { border-color: var(--sky); }
-    .service-card[data-color="moss"]:hover { border-color: var(--moss); }
-    .service-card[data-color="amber"]:hover{ border-color: var(--amber); }
-    .service-card[data-color="terra"]:hover{ border-color: var(--terra); }
-    .service-card[data-color="gold"]:hover { border-color: var(--gold); }
-    .service-card[data-color="dark"]:hover { border-color: #6e5e50; }
-
-    .service-icon {
-      width: 40px; height: 40px;
-      border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.2rem;
-      margin-bottom: 1rem;
-    }
-    .service-card[data-color="sky"]   .service-icon { background: rgba(91,164,207,0.15); color: var(--sky); }
-    .service-card[data-color="moss"]  .service-icon { background: rgba(123,158,90,0.15); color: var(--moss); }
-    .service-card[data-color="amber"] .service-icon { background: rgba(212,168,67,0.15); color: var(--amber); }
-    .service-card[data-color="terra"] .service-icon { background: rgba(196,85,58,0.15);  color: var(--terra); }
-    .service-card[data-color="gold"]  .service-icon { background: rgba(232,197,71,0.15); color: var(--gold); }
-    .service-card[data-color="dark"]  .service-icon { background: rgba(110,94,80,0.15);  color: #c8b89a; }
-
-    .service-card h3 {
-      font-size: 1rem;
-      font-weight: 700;
-      margin-bottom: 0.4rem;
-    }
-    .service-card p {
-      font-size: 0.875rem;
-      color: var(--muted);
-      line-height: 1.6;
-    }
-
-    /* ── Problem ─────────────────────────────────────────────── */
-    #problem {
-      background: var(--bg-card);
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      max-width: 100%;
-      padding: 6rem 1.5rem;
-    }
-    #problem > * { max-width: 1100px; margin-left: auto; margin-right: auto; }
-    #problem h2 { max-width: 1100px; }
-
-    #problem-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 1.25rem;
-      max-width: 1100px;
-      margin: 0 auto;
-    }
-    .pain-point {
-      background: var(--bg-card2);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.5rem;
-      display: flex;
-      align-items: flex-start;
-      gap: 1rem;
-    }
-    .pain-icon {
-      font-size: 1.3rem;
-      flex-shrink: 0;
-      margin-top: 2px;
-    }
-    .pain-point p {
-      font-size: 0.9rem;
-      color: var(--muted);
-      line-height: 1.5;
-    }
-
-    /* ── Process ─────────────────────────────────────────────── */
-    #process-steps {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0;
-      flex-wrap: wrap;
-    }
-    .step {
-      text-align: center;
-      flex: 1;
-      min-width: 160px;
-      max-width: 200px;
-      padding: 0 0.5rem;
-    }
-    .step-number {
-      width: 48px; height: 48px;
-      border-radius: 50%;
-      background: var(--amber);
-      color: #0f0d0b;
-      font-weight: 800;
-      font-size: 1.1rem;
-      display: flex; align-items: center; justify-content: center;
-      margin: 0 auto 1rem;
-    }
-    .step h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.4rem; }
-    .step p  { font-size: 0.82rem; color: var(--muted); line-height: 1.5; }
-
-    .step-connector {
-      flex: 0 0 60px;
-      height: 2px;
-      background: var(--border);
-      margin-top: -1.5rem;
-      position: relative;
-    }
-    .step-connector::after {
-      content: '';
-      position: absolute;
-      right: -4px; top: -4px;
-      border: 4px solid transparent;
-      border-left: 8px solid var(--border);
-    }
-
-    /* ── Pricing ─────────────────────────────────────────────── */
-    #pricing-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 1.25rem;
-      align-items: start;
-    }
-    .plan-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
+      background: var(--cream);
+      border: 1px solid rgba(19,15,10,0.07);
       border-radius: var(--radius);
       padding: 2rem;
-      position: relative;
-      transition: transform var(--transition), box-shadow var(--transition);
+      transition: box-shadow var(--transition), transform var(--transition);
     }
-    .plan-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 16px 48px rgba(0,0,0,0.4);
+    .service-card:hover { box-shadow: 0 8px 32px rgba(19,15,10,0.1); transform: translateY(-3px); }
+    .service-icon {
+      font-size: 1.75rem;
+      margin-bottom: 1rem;
+    }
+    .service-card h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem;
+      margin-bottom: 0.6rem;
+      color: var(--dark);
+    }
+    .service-card p {
+      font-size: 0.9rem;
+      line-height: 1.65;
+      color: var(--muted);
+    }
+
+    /* ── PROBLEM ──────────────────────────────────────────────── */
+    #problem { background: var(--dark); }
+    #problem .section-title { color: var(--cream); }
+    #problem .section-sub { color: rgba(250,246,240,0.55); }
+    #problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 1.5rem;
+    }
+    .problem-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: var(--radius);
+      padding: 1.75rem;
+    }
+    .problem-card h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem;
+      color: var(--amber);
+      margin-bottom: 0.5rem;
+    }
+    .problem-card p { font-size: 0.875rem; line-height: 1.65; color: rgba(250,246,240,0.55); }
+
+    /* ── PROCESS ──────────────────────────────────────────────── */
+    #process { background: var(--cream); }
+    #process-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 2rem;
+      counter-reset: steps;
+    }
+    .process-step { counter-increment: steps; position: relative; }
+    .process-step::before {
+      content: counter(steps, decimal-leading-zero);
+      font-family: 'DM Mono', monospace;
+      font-size: 2.5rem;
+      font-weight: 500;
+      color: rgba(200,120,42,0.18);
+      display: block;
+      margin-bottom: 0.75rem;
+      line-height: 1;
+    }
+    .process-step h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      color: var(--dark);
+      margin-bottom: 0.5rem;
+    }
+    .process-step p { font-size: 0.875rem; line-height: 1.65; color: var(--muted); }
+
+    /* ── PRICING ──────────────────────────────────────────────── */
+    #pricing { background: var(--dark-2); }
+    #pricing .section-title { color: var(--cream); }
+    #pricing .section-sub { color: rgba(250,246,240,0.5); }
+    #pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+      max-width: 960px;
+    }
+    .plan-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: var(--radius);
+      padding: 2.25rem 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      transition: border-color var(--transition), box-shadow var(--transition);
     }
     .plan-card.featured {
       border-color: var(--amber);
-      background: linear-gradient(160deg, #221e1a 0%, #1a1714 100%);
-      box-shadow: 0 8px 40px rgba(212, 168, 67, 0.15);
+      box-shadow: 0 0 0 1px var(--amber), 0 12px 40px rgba(200,120,42,0.15);
     }
-    .badge {
-      display: inline-block;
-      font-size: 0.7rem;
-      font-weight: 700;
-      letter-spacing: 0.08em;
+    .plan-badge {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
       background: var(--amber);
-      color: #0f0d0b;
-      padding: 0.25rem 0.7rem;
-      border-radius: 20px;
-      margin-bottom: 1rem;
+      color: var(--dark);
+      padding: 0.25rem 0.65rem;
+      border-radius: 999px;
+      align-self: flex-start;
     }
-    .plan-card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.75rem; }
-    .price {
-      font-size: 2.6rem;
-      font-weight: 800;
-      letter-spacing: -0.04em;
+    .plan-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      color: var(--cream);
+    }
+    .plan-price {
+      font-family: 'DM Mono', monospace;
+      font-size: 2rem;
+      font-weight: 500;
       color: var(--amber);
-      margin-bottom: 1.5rem;
-      line-height: 1;
     }
-    .price span { font-size: 1rem; font-weight: 500; color: var(--muted); }
-    .plan-card ul { margin-bottom: 2rem; }
-    .plan-card ul li {
+    .plan-price span { font-size: 0.9rem; color: rgba(250,246,240,0.4); font-weight: 400; }
+    .plan-features { list-style: none; padding: 0; }
+    .plan-features li {
       font-size: 0.875rem;
-      color: var(--muted);
-      padding: 0.45rem 0;
-      border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; gap: 0.5rem;
+      color: rgba(250,246,240,0.65);
+      padding: 0.35rem 0;
+      display: flex;
+      gap: 0.5rem;
+      align-items: flex-start;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
     }
-    .plan-card ul li::before {
-      content: '✓';
-      color: var(--moss);
-      font-weight: 700;
-      font-size: 0.8rem;
-    }
-    .plan-card a {
-      display: block;
-      text-align: center;
-      padding: 0.75rem;
-      border-radius: 8px;
-      font-weight: 700;
-      font-size: 0.9rem;
-      transition: background var(--transition), color var(--transition), transform var(--transition);
-      border: 2px solid var(--border);
-      color: var(--muted);
-    }
-    .plan-card a:hover {
-      border-color: var(--amber);
-      color: var(--amber);
-      transform: translateY(-1px);
-    }
-    .plan-card.featured a {
-      background: var(--amber);
-      color: #0f0d0b;
-      border-color: var(--amber);
-    }
-    .plan-card.featured a:hover {
-      background: var(--gold);
-      transform: translateY(-1px);
+    .plan-features li::before { content: '✓'; color: var(--amber); flex-shrink: 0; }
+    .plan-cta {
+      margin-top: auto;
+      padding-top: 1.25rem;
     }
 
-    /* ── Audit ───────────────────────────────────────────────── */
-    #audit {
-      max-width: 100%;
-      background: var(--bg-card);
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      padding: 6rem 1.5rem;
+    /* ── AUDIT FORM ───────────────────────────────────────────── */
+    #audit { background: var(--cream-2); }
+    #audit-form-wrap {
+      max-width: 560px;
+      background: var(--cream);
+      border: 1px solid rgba(19,15,10,0.08);
+      border-radius: var(--radius);
+      padding: 2.5rem;
     }
-    #audit-inner {
-      max-width: 1100px;
-      margin: 0 auto;
+    .field-group {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 4rem;
-      align-items: center;
+      gap: 1rem;
     }
-    #audit-left h2 {
-      text-align: left;
-      margin-bottom: 0.75rem;
-    }
-    #audit-left p {
+    @media (max-width: 560px) { .field-group { grid-template-columns: 1fr; } }
+    .field { margin-bottom: 1.1rem; }
+    .field label {
+      display: block;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
       color: var(--muted);
-      font-size: 0.95rem;
-      line-height: 1.7;
-      margin-bottom: 1.75rem;
+      margin-bottom: 0.4rem;
     }
-    #audit-form {
-      display: flex;
-      gap: 0.75rem;
-      flex-wrap: wrap;
-    }
-    #audit-form input {
-      flex: 1;
-      min-width: 200px;
-      background: var(--bg);
-      border: 1px solid var(--border);
+    .field input, .field select {
+      width: 100%;
+      background: var(--cream-2);
+      border: 1px solid rgba(19,15,10,0.1);
       border-radius: 8px;
-      padding: 0.75rem 1rem;
-      color: var(--text);
+      padding: 0.65rem 0.9rem;
+      font-family: 'DM Sans', sans-serif;
       font-size: 0.9rem;
+      color: var(--dark);
       outline: none;
       transition: border-color var(--transition);
     }
-    #audit-form input:focus { border-color: var(--amber); }
-    #audit-form button {
-      background: var(--amber);
-      color: #0f0d0b;
-      font-weight: 700;
-      font-size: 0.9rem;
-      padding: 0.75rem 1.5rem;
-      border: none;
-      border-radius: 8px;
-      cursor: none;
-      transition: background var(--transition), transform var(--transition);
-      white-space: nowrap;
+    .field input:focus, .field select:focus { border-color: var(--amber); }
+    #audit-msg {
+      margin-top: 1rem;
+      font-size: 0.875rem;
+      min-height: 1.2em;
     }
-    #audit-form button:hover { background: var(--gold); transform: translateY(-1px); }
+    #audit-msg.success { color: var(--moss); }
+    #audit-msg.error { color: var(--terra); }
 
-    #audit-right {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1.75rem;
-    }
-    #score-ring {
-      position: relative;
-      width: 140px; height: 140px;
-    }
-    #score-ring svg {
-      width: 100%; height: 100%;
-      transform: rotate(-90deg);
-    }
-    #score-ring svg circle:first-child { stroke: var(--border); }
-    #score-arc { stroke: var(--amber); stroke-linecap: round; stroke-dasharray: 314; stroke-dashoffset: 314; transition: stroke-dashoffset 1.4s ease; }
-    #score-number {
-      position: absolute;
-      inset: 0;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.5rem;
-      font-weight: 800;
-      color: var(--amber);
-    }
-    #score-number span { font-size: 0.75rem; color: var(--muted); font-weight: 500; }
-
-    #score-metrics { width: 100%; max-width: 280px; display: flex; flex-direction: column; gap: 1rem; }
-    .metric span { font-size: 0.8rem; color: var(--muted); display: block; margin-bottom: 0.35rem; }
-    .bar { background: var(--border); border-radius: 4px; height: 6px; overflow: hidden; }
-    .bar-fill { height: 100%; background: var(--amber); border-radius: 4px; width: 0; transition: width 1s ease; }
-
-    /* ── Testimonials ────────────────────────────────────────── */
-    #testimonials-grid {
+    /* ── TESTIMONIALS ─────────────────────────────────────────── */
+    #testimonials { background: var(--dark); }
+    #testimonials .section-title { color: var(--cream); }
+    #testi-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1.25rem;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
     }
-    .testimonial {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
+    .testi-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.07);
       border-radius: var(--radius);
       padding: 1.75rem;
-      display: flex;
-      flex-direction: column;
-      gap: 1.25rem;
     }
-    .testimonial blockquote {
-      font-size: 0.93rem;
-      color: var(--text);
-      line-height: 1.7;
+    .testi-stars { color: var(--amber); font-size: 0.9rem; margin-bottom: 0.75rem; }
+    .testi-quote {
+      font-family: 'Playfair Display', serif;
       font-style: italic;
-    }
-    .testimonial blockquote::before { content: '"'; color: var(--amber); font-size: 1.4rem; line-height: 0; vertical-align: -6px; margin-right: 3px; }
-    .testimonial cite {
-      font-size: 0.8rem;
-      color: var(--muted);
-      font-style: normal;
-      font-weight: 600;
-    }
-
-    /* ── Final CTA ───────────────────────────────────────────── */
-    #cta-final {
-      text-align: center;
-      padding: 7rem 1.5rem;
-    }
-    #cta-final h2 { margin-bottom: 0.75rem; }
-    #cta-final > p:first-of-type {
-      color: var(--muted);
-      font-size: 1.05rem;
-      margin-bottom: 2.25rem;
-    }
-    #cta-final a.cta-btn {
-      display: inline-block;
-      background: var(--amber);
-      color: #0f0d0b;
-      font-weight: 700;
       font-size: 1rem;
-      padding: 0.9rem 2.25rem;
-      border-radius: 8px;
-      transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
-      box-shadow: 0 4px 24px rgba(212, 168, 67, 0.25);
+      line-height: 1.65;
+      color: rgba(250,246,240,0.8);
+      margin-bottom: 1rem;
     }
-    #cta-final a.cta-btn:hover {
-      background: var(--gold);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 36px rgba(212, 168, 67, 0.4);
+    .testi-author {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      color: rgba(250,246,240,0.4);
     }
-    #cta-final > p:last-of-type {
-      margin-top: 1.5rem;
-      font-size: 0.85rem;
-      color: var(--muted);
-    }
-    #cta-final > p:last-of-type a {
-      color: var(--amber);
-      transition: color var(--transition);
-    }
-    #cta-final > p:last-of-type a:hover { color: var(--gold); }
+    .testi-author strong { color: var(--amber); display: block; font-size: 0.82rem; margin-bottom: 0.15rem; }
 
-    /* ── Footer ──────────────────────────────────────────────── */
-    #footer {
-      border-top: 1px solid var(--border);
-      padding: 2rem 2.5rem;
+    /* ── FOOTER ───────────────────────────────────────────────── */
+    footer {
+      background: var(--dark);
+      border-top: 1px solid rgba(200,120,42,0.12);
+      padding: 3rem 5vw;
       display: flex;
-      align-items: center;
       justify-content: space-between;
+      align-items: center;
       flex-wrap: wrap;
       gap: 1rem;
-      max-width: 100%;
     }
-    #footer-logo { color: var(--amber); font-weight: 700; font-size: 1rem; }
-    #footer > span:nth-child(2) { font-size: 0.8rem; color: var(--muted); }
-    #footer nav { display: flex; gap: 1.5rem; }
-    #footer nav a { font-size: 0.8rem; color: var(--muted); transition: color var(--transition); }
-    #footer nav a:hover { color: var(--text); }
-
-    /* ── Responsive ──────────────────────────────────────────── */
-    @media (max-width: 768px) {
-      #navbar > ul, #navbar > div { display: none; }
-      #hamburger { display: block; }
-
-      #audit-inner { grid-template-columns: 1fr; gap: 2.5rem; }
-      #audit-left h2 { text-align: center; }
-      #audit-right { align-items: center; }
-
-      .step-connector { display: none; }
-      #process-steps { flex-direction: column; align-items: center; gap: 2rem; }
-
-      #footer { flex-direction: column; text-align: center; }
-      #footer nav { justify-content: center; }
+    .footer-logo {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 1.2rem;
+      color: var(--amber);
     }
+    .footer-copy {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.06em;
+      color: rgba(250,246,240,0.3);
+    }
+    .footer-links { display: flex; gap: 1.5rem; }
+    .footer-links a {
+      font-size: 0.85rem;
+      color: rgba(250,246,240,0.45);
+      text-decoration: none;
+      transition: color var(--transition);
+    }
+    .footer-links a:hover { color: var(--cream); }
   </style>
 </head>
 <body>
 
-  <!-- Custom cursor -->
-  <div id="cursor"></div>
-
-  <!-- Mobile nav -->
-  <div id="mobile-nav">
-    <button id="mobile-close">&#10005;</button>
-    <a href="#services">Services</a>
-    <a href="#process">Process</a>
-    <a href="#pricing">Pricing</a>
-    <a href="#about">About</a>
-    <a href="#audit" style="color:var(--amber)">Free Audit</a>
-  </div>
-
-  <!-- NAVBAR -->
-  <nav id="navbar">
-    <a href="#" id="logo">BrewStudio</a>
-    <ul>
+  <!-- NAV -->
+  <nav id="nav">
+    <a href="#" id="nav-logo">BrewStudio</a>
+    <button id="nav-hamburger" aria-label="Menu">&#9776;</button>
+    <ul id="nav-links">
       <li><a href="#services">Services</a></li>
-      <li><a href="#process">Process</a></li>
       <li><a href="#pricing">Pricing</a></li>
-      <li><a href="#about">About</a></li>
+      <li><a href="#audit">Free Audit</a></li>
+      <li><a href="dashboard.html" class="nav-dashboard">Dashboard</a></li>
+      <li><a href="#audit" class="nav-cta">Get Started</a></li>
     </ul>
-    <div>
-      <a href="#audit">Free Audit</a>
-      <a href="dashboard.html">Dashboard</a>
-    </div>
-    <button id="hamburger">&#9776;</button>
   </nav>
 
   <!-- HERO -->
   <section id="hero">
-    <canvas id="particles"></canvas>
+    <canvas id="hero-canvas"></canvas>
     <div id="hero-content">
-      <h1>Your café deserves<br>to be <span>seen.</span></h1>
-      <p>We help specialty coffee shops in Norway grow their online presence — honestly and consistently.</p>
-      <a href="#audit">Get your free audit</a>
+      <p class="hero-eyebrow">Specialty Coffee Marketing</p>
+      <h1>Your café<br>deserves to<br>be <em>seen</em></h1>
+      <p class="hero-sub">We help specialty coffee brands grow on Instagram — from content strategy to community growth and analytics-backed campaigns.</p>
+      <div class="hero-actions">
+        <a href="#audit" class="btn-primary">Get a Free Audit →</a>
+        <a href="#services" class="btn-ghost">See what we do</a>
+      </div>
     </div>
     <div id="hero-stats">
-      <div class="stat reveal">
-        <div class="stat-value"><span class="count" data-target="3">0</span>×</div>
-        <p>Average growth in 6 months</p>
+      <div class="hero-stat">
+        <span class="hero-stat-num" data-target="3" data-suffix="x">0x</span>
+        <span class="hero-stat-label">Avg. Growth</span>
       </div>
-      <div class="stat reveal reveal-delay-2">
-        <div class="stat-value"><span class="count" data-target="12">0</span></div>
-        <p>Specialty cafés</p>
+      <div class="hero-stat">
+        <span class="hero-stat-num" data-target="12" data-suffix="">0</span>
+        <span class="hero-stat-label">Months Avg.</span>
       </div>
-      <div class="stat reveal reveal-delay-4">
-        <div class="stat-value"><span class="count" data-target="100">0</span>%</div>
-        <p>Specialty coffee focus</p>
+      <div class="hero-stat">
+        <span class="hero-stat-num" data-target="100" data-suffix="%">0%</span>
+        <span class="hero-stat-label">Coffee-Only</span>
       </div>
     </div>
   </section>
@@ -762,368 +591,362 @@
   <!-- TICKER -->
   <div id="ticker">
     <div id="ticker-track">
-      <span>Social Media &nbsp;·&nbsp; Content Creation &nbsp;·&nbsp; Website Design &nbsp;·&nbsp; Brand Identity &nbsp;·&nbsp; Strategy &nbsp;·&nbsp; Full Package &nbsp;·&nbsp; Social Media &nbsp;·&nbsp; Content Creation &nbsp;·&nbsp; Website Design &nbsp;·&nbsp; Brand Identity &nbsp;·&nbsp; Strategy &nbsp;·&nbsp; Full Package &nbsp;·&nbsp; Social Media &nbsp;·&nbsp; Content Creation &nbsp;·&nbsp; Website Design &nbsp;·&nbsp; Brand Identity &nbsp;·&nbsp; Strategy &nbsp;·&nbsp; Full Package &nbsp;·&nbsp;</span>
-      <span>Social Media &nbsp;·&nbsp; Content Creation &nbsp;·&nbsp; Website Design &nbsp;·&nbsp; Brand Identity &nbsp;·&nbsp; Strategy &nbsp;·&nbsp; Full Package &nbsp;·&nbsp; Social Media &nbsp;·&nbsp; Content Creation &nbsp;·&nbsp; Website Design &nbsp;·&nbsp; Brand Identity &nbsp;·&nbsp; Strategy &nbsp;·&nbsp; Full Package &nbsp;·&nbsp; Social Media &nbsp;·&nbsp; Content Creation &nbsp;·&nbsp; Website Design &nbsp;·&nbsp; Brand Identity &nbsp;·&nbsp; Strategy &nbsp;·&nbsp; Full Package &nbsp;·&nbsp;</span>
+      <span class="ticker-item">Instagram Growth</span><span class="ticker-item ticker-dot">◆</span>
+      <span class="ticker-item">Content Strategy</span><span class="ticker-item ticker-dot">◆</span>
+      <span class="ticker-item">Brand Identity</span><span class="ticker-item ticker-dot">◆</span>
+      <span class="ticker-item">Audit Reports</span><span class="ticker-item ticker-dot">◆</span>
+      <span class="ticker-item">Specialty Coffee</span><span class="ticker-item ticker-dot">◆</span>
+      <span class="ticker-item">Community Building</span><span class="ticker-item ticker-dot">◆</span>
+      <span class="ticker-item">Instagram Growth</span><span class="ticker-item ticker-dot">◆</span>
+      <span class="ticker-item">Content Strategy</span><span class="ticker-item ticker-dot">◆</span>
+      <span class="ticker-item">Brand Identity</span><span class="ticker-item ticker-dot">◆</span>
+      <span class="ticker-item">Audit Reports</span><span class="ticker-item ticker-dot">◆</span>
+      <span class="ticker-item">Specialty Coffee</span><span class="ticker-item ticker-dot">◆</span>
+      <span class="ticker-item">Community Building</span><span class="ticker-item ticker-dot">◆</span>
     </div>
   </div>
 
   <!-- SERVICES -->
-  <section id="services">
-    <h2 class="reveal">What we do</h2>
+  <section id="services" class="section">
+    <p class="section-label reveal">What we offer</p>
+    <h2 class="section-title reveal">Full-stack marketing<br>for coffee brands</h2>
+    <p class="section-sub reveal">Every service is designed specifically for the specialty coffee world — we speak your language.</p>
     <div id="services-grid">
-      <div class="service-card reveal reveal-delay-1" data-color="sky">
-        <div class="service-icon">📱</div>
-        <h3>Social Media</h3>
-        <p>Consistent presence across Instagram and beyond.</p>
-      </div>
-      <div class="service-card reveal reveal-delay-2" data-color="moss">
-        <div class="service-icon">📷</div>
-        <h3>Content Creation</h3>
-        <p>Photography, copy, and creative that feels genuine.</p>
-      </div>
-      <div class="service-card reveal reveal-delay-3" data-color="amber">
-        <div class="service-icon">🖥</div>
-        <h3>Website Design</h3>
-        <p>Clean, fast sites that reflect your café's character.</p>
-      </div>
-      <div class="service-card reveal reveal-delay-4" data-color="terra">
-        <div class="service-icon">✏️</div>
-        <h3>Brand Identity</h3>
-        <p>Logo, colours, and tone that hold together everywhere.</p>
-      </div>
-      <div class="service-card reveal reveal-delay-5" data-color="gold">
-        <div class="service-icon">📊</div>
-        <h3>Strategy</h3>
-        <p>A clear plan built around your goals, not vanity metrics.</p>
-      </div>
-      <div class="service-card reveal reveal-delay-6" data-color="dark">
+      <div class="service-card reveal">
         <div class="service-icon">☕</div>
-        <h3>Full Package</h3>
-        <p>Everything, handled. You focus on the coffee.</p>
+        <h3>Instagram Audit</h3>
+        <p>Deep analysis of your profile, content consistency, engagement rate, hashtag strategy, and CTA effectiveness.</p>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-icon">📸</div>
+        <h3>Content Strategy</h3>
+        <p>Monthly content calendars built around your roast schedule, events, and signature drinks — never run out of ideas.</p>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-icon">📈</div>
+        <h3>Growth Campaigns</h3>
+        <p>Follower acquisition campaigns targeting coffee-adjacent audiences in your city and beyond.</p>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-icon">🎨</div>
+        <h3>Brand Identity</h3>
+        <p>Visual identity refresh — color palettes, typography, and photography direction that feels premium and cohesive.</p>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-icon">🤝</div>
+        <h3>Influencer Outreach</h3>
+        <p>We identify and pitch micro-influencers in the specialty coffee space who genuinely love what they review.</p>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-icon">📊</div>
+        <h3>Monthly Reporting</h3>
+        <p>Clear dashboards covering follower growth, reach, saves, and story performance — so you always know what's working.</p>
       </div>
     </div>
   </section>
 
   <!-- PROBLEM -->
-  <section id="problem">
-    <h2 class="reveal">Sound familiar?</h2>
+  <section id="problem" class="section">
+    <p class="section-label reveal">The challenge</p>
+    <h2 class="section-title reveal">Great coffee<br>isn't enough</h2>
+    <p class="section-sub reveal">Even the best roasters struggle to grow online without a consistent, strategic presence.</p>
     <div id="problem-grid">
-      <div class="pain-point reveal reveal-delay-1">
-        <span class="pain-icon">😩</span>
-        <p>Posting inconsistently and losing followers</p>
+      <div class="problem-card reveal">
+        <h3>Inconsistent posting</h3>
+        <p>The algorithm rewards consistency. Without a system, even weekly posts become a struggle.</p>
       </div>
-      <div class="pain-point reveal reveal-delay-2">
-        <span class="pain-icon">👻</span>
-        <p>Great coffee, invisible online</p>
+      <div class="problem-card reveal">
+        <h3>Wrong audience</h3>
+        <p>Getting followers is easy. Getting coffee lovers in your city who'll actually walk in is the real challenge.</p>
       </div>
-      <div class="pain-point reveal reveal-delay-3">
-        <span class="pain-icon">⏰</span>
-        <p>No time to think about content</p>
+      <div class="problem-card reveal">
+        <h3>No visual identity</h3>
+        <p>A mismatched feed kills first impressions. Potential customers scroll past in under a second.</p>
       </div>
-      <div class="pain-point reveal reveal-delay-4">
-        <span class="pain-icon">🔍</span>
-        <p>No clear brand identity</p>
+      <div class="problem-card reveal">
+        <h3>Zero time</h3>
+        <p>You're a barista, not a marketer. Between roasting and serving, there's no time for strategy.</p>
       </div>
     </div>
   </section>
 
   <!-- PROCESS -->
-  <section id="process">
-    <h2 class="reveal">How it works</h2>
+  <section id="process" class="section">
+    <p class="section-label reveal">How it works</p>
+    <h2 class="section-title reveal">From audit<br>to growth</h2>
+    <p class="section-sub reveal">A simple four-step process designed to get results fast.</p>
     <div id="process-steps">
-      <div class="step reveal reveal-delay-1">
-        <div class="step-number">1</div>
+      <div class="process-step reveal">
         <h3>Free Audit</h3>
-        <p>We analyse your current online presence</p>
+        <p>We analyze your current Instagram profile and send you a detailed 6-point scorecard within 48 hours.</p>
       </div>
-      <div class="step-connector reveal reveal-delay-2"></div>
-      <div class="step reveal reveal-delay-2">
-        <div class="step-number">2</div>
-        <h3>Discovery Call</h3>
-        <p>We align on goals and strategy</p>
+      <div class="process-step reveal">
+        <h3>Strategy Call</h3>
+        <p>A 30-minute call to review your audit results, align on goals, and propose a tailored growth plan.</p>
       </div>
-      <div class="step-connector reveal reveal-delay-3"></div>
-      <div class="step reveal reveal-delay-3">
-        <div class="step-number">3</div>
-        <h3>Month One</h3>
-        <p>Content plan, templates, and first posts live</p>
+      <div class="process-step reveal">
+        <h3>Onboarding</h3>
+        <p>We set up your content calendar, brand guidelines, and reporting dashboard — ready to post in week one.</p>
       </div>
-      <div class="step-connector reveal reveal-delay-4"></div>
-      <div class="step reveal reveal-delay-4">
-        <div class="step-number">4</div>
-        <h3>Grow Together</h3>
-        <p>Monthly reporting and continuous improvement</p>
+      <div class="process-step reveal">
+        <h3>Growth & Reporting</h3>
+        <p>Monthly campaigns, community management, and clear analytics reports so you always see the ROI.</p>
       </div>
     </div>
   </section>
 
   <!-- PRICING -->
-  <section id="pricing">
-    <h2 class="reveal">Simple pricing</h2>
+  <section id="pricing" class="section">
+    <p class="section-label reveal">Pricing</p>
+    <h2 class="section-title reveal">Simple,<br>transparent plans</h2>
+    <p class="section-sub reveal">No hidden fees. Cancel anytime. Start with an audit.</p>
     <div id="pricing-grid">
-      <div class="plan-card reveal reveal-delay-1">
-        <h3>Starter</h3>
-        <div class="price">$300<span>/mo</span></div>
-        <ul>
-          <li>Social media management</li>
-          <li>12 posts/month</li>
-          <li>Monthly report</li>
+      <div class="plan-card reveal">
+        <p class="plan-name">Starter</p>
+        <p class="plan-price">$300 <span>/ month</span></p>
+        <ul class="plan-features">
+          <li>Instagram audit report</li>
+          <li>Monthly content calendar</li>
+          <li>8 posts per month</li>
+          <li>Basic analytics report</li>
         </ul>
-        <a href="#audit">Get started</a>
+        <div class="plan-cta"><a href="#audit" class="btn-primary" style="width:100%;justify-content:center;">Get started</a></div>
       </div>
-      <div class="plan-card featured reveal reveal-delay-2">
-        <div class="badge">Most popular</div>
-        <h3>Growth</h3>
-        <div class="price">$700<span>/mo</span></div>
-        <ul>
+      <div class="plan-card featured reveal">
+        <p class="plan-badge">Most popular</p>
+        <p class="plan-name">Growth</p>
+        <p class="plan-price">$700 <span>/ month</span></p>
+        <ul class="plan-features">
           <li>Everything in Starter</li>
-          <li>Content creation</li>
-          <li>Website updates</li>
-          <li>Strategy calls</li>
+          <li>16 posts per month</li>
+          <li>Story sequences (4/mo)</li>
+          <li>Growth campaign</li>
+          <li>Influencer outreach (2/mo)</li>
+          <li>Monthly strategy call</li>
         </ul>
-        <a href="#audit">Get started</a>
+        <div class="plan-cta"><a href="#audit" class="btn-primary" style="width:100%;justify-content:center;">Get started</a></div>
       </div>
-      <div class="plan-card reveal reveal-delay-3">
-        <h3>Full Brand</h3>
-        <div class="price">$1,500<span>/mo</span></div>
-        <ul>
+      <div class="plan-card reveal">
+        <p class="plan-name">Full Brand</p>
+        <p class="plan-price">$1,500 <span>/ month</span></p>
+        <ul class="plan-features">
           <li>Everything in Growth</li>
-          <li>Full brand identity</li>
-          <li>Custom website</li>
+          <li>Brand identity refresh</li>
+          <li>24 posts per month</li>
+          <li>Weekly strategy sessions</li>
           <li>Priority support</li>
+          <li>Custom reporting dashboard</li>
         </ul>
-        <a href="#audit">Get started</a>
+        <div class="plan-cta"><a href="#audit" class="btn-primary" style="width:100%;justify-content:center;">Get started</a></div>
       </div>
     </div>
   </section>
 
-  <!-- AUDIT -->
-  <section id="audit">
-    <div id="audit-inner">
-      <div id="audit-left" class="reveal">
-        <h2>Get your free audit</h2>
-        <p>We'll review your online presence and tell you exactly where you stand — no commitment, no pressure.</p>
-        <form id="audit-form">
-          <input type="email" placeholder="your@email.com" required>
-          <button type="submit">Get my free audit</button>
-        </form>
-      </div>
-      <div id="audit-right" class="reveal reveal-delay-2">
-        <div id="score-ring">
-          <svg viewBox="0 0 120 120">
-            <circle cx="60" cy="60" r="50" fill="none" stroke-width="10"/>
-            <circle id="score-arc" cx="60" cy="60" r="50" fill="none" stroke-width="10"/>
-          </svg>
-          <div id="score-number">67<span>/100</span></div>
-        </div>
-        <div id="score-metrics">
-          <div class="metric">
-            <span>Posting Frequency</span>
-            <div class="bar"><div class="bar-fill" data-width="55"></div></div>
+  <!-- AUDIT FORM -->
+  <section id="audit" class="section">
+    <p class="section-label reveal">Free audit</p>
+    <h2 class="section-title reveal">Get your free<br>Instagram audit</h2>
+    <p class="section-sub reveal">Fill in the form and we'll send your 6-point scorecard within 48 hours — no commitment required.</p>
+    <div id="audit-form-wrap" class="reveal">
+      <form id="audit-form" novalidate>
+        <div class="field-group">
+          <div class="field">
+            <label for="f-cafe">Café name *</label>
+            <input type="text" id="f-cafe" placeholder="Black Bear Coffee" required>
           </div>
-          <div class="metric">
-            <span>Profile Optimisation</span>
-            <div class="bar"><div class="bar-fill" data-width="72"></div></div>
-          </div>
-          <div class="metric">
-            <span>Engagement Rate</span>
-            <div class="bar"><div class="bar-fill" data-width="40"></div></div>
+          <div class="field">
+            <label for="f-email">Email *</label>
+            <input type="email" id="f-email" placeholder="hello@blackbear.co" required>
           </div>
         </div>
-      </div>
+        <div class="field-group">
+          <div class="field">
+            <label for="f-ig">Instagram handle</label>
+            <input type="text" id="f-ig" placeholder="@blackbearcoffee">
+          </div>
+          <div class="field">
+            <label for="f-city">City</label>
+            <input type="text" id="f-city" placeholder="Buenos Aires">
+          </div>
+        </div>
+        <button type="submit" class="btn-primary" style="width:100%;justify-content:center;margin-top:0.5rem;">
+          Request free audit →
+        </button>
+        <p id="audit-msg"></p>
+      </form>
     </div>
   </section>
 
   <!-- TESTIMONIALS -->
-  <section id="testimonials">
-    <h2 class="reveal">From our clients</h2>
-    <div id="testimonials-grid">
-      <div class="testimonial reveal reveal-delay-1">
-        <blockquote>We went from posting twice a month to having a real brand people recognise. Quiet, consistent work that actually showed up.</blockquote>
-        <cite>Astrid Haugen — Lysgård Kafé, Bergen</cite>
+  <section id="testimonials" class="section">
+    <p class="section-label reveal">What clients say</p>
+    <h2 class="section-title reveal">Results speak<br>for themselves</h2>
+    <div id="testi-grid">
+      <div class="testi-card reveal">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-quote">"We went from 800 to 6,400 followers in 8 months. The audit alone was worth it — it showed us exactly what we were doing wrong."</p>
+        <div class="testi-author"><strong>Martina Reyes</strong>Bloom Roasters · Buenos Aires</div>
       </div>
-      <div class="testimonial reveal reveal-delay-2">
-        <blockquote>They understood what specialty coffee means to us. The content doesn't feel like marketing — it feels like us.</blockquote>
-        <cite>Magnus Dahl — Filteret, Trondheim</cite>
+      <div class="testi-card reveal">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-quote">"Finally a marketing agency that actually understands specialty coffee. They know the difference between a flat white and a cortado."</p>
+        <div class="testi-author"><strong>Diego Varela</strong>Altura Coffee · Medellín</div>
       </div>
-      <div class="testimonial reveal reveal-delay-3">
-        <blockquote>Simple process, honest reporting. We know what's working and what isn't every single month.</blockquote>
-        <cite>Ingrid Solberg — Havnekafé, Stavanger</cite>
+      <div class="testi-card reveal">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-quote">"The content calendar took so much stress off our plate. We post consistently now and our engagement rate doubled in three months."</p>
+        <div class="testi-author"><strong>Sofia Mendez</strong>Café Nube · Santiago</div>
       </div>
     </div>
   </section>
 
-  <!-- FINAL CTA -->
-  <section id="cta-final">
-    <h2 class="reveal">Ready to be found?</h2>
-    <p class="reveal reveal-delay-1">Start with a free audit — no commitment, no pressure.</p>
-    <a href="#audit" class="cta-btn reveal reveal-delay-2">Start with a free audit</a>
-    <p class="reveal reveal-delay-3"><a href="mailto:hei@brewstudio.no">hei@brewstudio.no</a></p>
-  </section>
-
   <!-- FOOTER -->
-  <footer id="footer">
-    <span id="footer-logo">BrewStudio</span>
-    <span>&copy; 2025 BrewStudio. Made with care for specialty coffee.</span>
-    <nav>
+  <footer>
+    <span class="footer-logo">BrewStudio</span>
+    <nav class="footer-links">
       <a href="#services">Services</a>
       <a href="#pricing">Pricing</a>
-      <a href="mailto:hei@brewstudio.no">Contact</a>
+      <a href="#audit">Audit</a>
+      <a href="dashboard.html">Dashboard</a>
     </nav>
+    <span class="footer-copy">© 2026 BrewStudio. All rights reserved.</span>
   </footer>
 
   <script>
-    // ── Custom cursor ─────────────────────────────────────────
-    const cursor = document.getElementById('cursor');
-    document.addEventListener('mousemove', e => {
-      cursor.style.left = e.clientX + 'px';
-      cursor.style.top  = e.clientY + 'px';
-    });
-    document.querySelectorAll('a, button, .service-card, .plan-card').forEach(el => {
-      el.addEventListener('mouseenter', () => cursor.classList.add('hovering'));
-      el.addEventListener('mouseleave', () => cursor.classList.remove('hovering'));
-    });
+    const API = 'https://brewstudio-backend-production.up.railway.app';
 
-    // ── Navbar scroll ─────────────────────────────────────────
-    const navbar = document.getElementById('navbar');
-    window.addEventListener('scroll', () => {
-      navbar.classList.toggle('scrolled', window.scrollY > 40);
-    });
-
-    // ── Mobile nav ────────────────────────────────────────────
-    document.getElementById('hamburger').addEventListener('click', () => {
-      document.getElementById('mobile-nav').classList.add('open');
-    });
-    document.getElementById('mobile-close').addEventListener('click', () => {
-      document.getElementById('mobile-nav').classList.remove('open');
-    });
-    document.querySelectorAll('#mobile-nav a').forEach(a => {
-      a.addEventListener('click', () => document.getElementById('mobile-nav').classList.remove('open'));
-    });
-
-    // ── Particles canvas ──────────────────────────────────────
-    const canvas = document.getElementById('particles');
+    // ── Particles ──────────────────────────────────────────────
+    const canvas = document.getElementById('hero-canvas');
     const ctx = canvas.getContext('2d');
-    let W, H, particles = [];
+    let particles = [];
 
-    function resize() {
-      W = canvas.width  = canvas.offsetWidth;
-      H = canvas.height = canvas.offsetHeight;
+    function resizeCanvas() {
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
     }
-
-    class Particle {
-      constructor() { this.reset(true); }
-      reset(init) {
-        this.x  = Math.random() * W;
-        this.y  = init ? Math.random() * H : H + 10;
-        this.r  = Math.random() * 1.8 + 0.4;
-        this.vx = (Math.random() - 0.5) * 0.3;
-        this.vy = -(Math.random() * 0.5 + 0.15);
-        this.alpha = Math.random() * 0.5 + 0.1;
-      }
-      update() {
-        this.x += this.vx;
-        this.y += this.vy;
-        if (this.y < -10) this.reset(false);
-      }
-      draw() {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(212, 168, 67, ${this.alpha})`;
-        ctx.fill();
-      }
-    }
+    resizeCanvas();
+    window.addEventListener('resize', () => { resizeCanvas(); initParticles(); });
 
     function initParticles() {
-      resize();
-      particles = Array.from({ length: 80 }, () => new Particle());
+      particles = [];
+      const count = Math.floor((canvas.width * canvas.height) / 14000);
+      for (let i = 0; i < count; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          r: Math.random() * 1.5 + 0.3,
+          vx: (Math.random() - 0.5) * 0.25,
+          vy: (Math.random() - 0.5) * 0.25,
+          a: Math.random() * 0.4 + 0.1
+        });
+      }
     }
+    initParticles();
 
     function animateParticles() {
-      ctx.clearRect(0, 0, W, H);
-      particles.forEach(p => { p.update(); p.draw(); });
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        p.x += p.vx; p.y += p.vy;
+        if (p.x < 0) p.x = canvas.width;
+        if (p.x > canvas.width) p.x = 0;
+        if (p.y < 0) p.y = canvas.height;
+        if (p.y > canvas.height) p.y = 0;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(200,120,42,${p.a})`;
+        ctx.fill();
+      });
       requestAnimationFrame(animateParticles);
     }
-
-    window.addEventListener('resize', () => {
-      resize();
-      particles.forEach(p => { if (p.x > W) p.x = Math.random() * W; });
-    });
-    initParticles();
     animateParticles();
 
-    // ── Scroll reveal ─────────────────────────────────────────
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-          // Animate score ring when audit section is visible
-          if (entry.target.id === 'audit-right' || entry.target.closest('#audit-right')) {
-            animateScoreRing();
-          }
+    // ── Count-up ───────────────────────────────────────────────
+    function countUp(el, target, suffix) {
+      let start = 0;
+      const dur = 1800;
+      const step = 16;
+      const inc = target / (dur / step);
+      const timer = setInterval(() => {
+        start = Math.min(start + inc, target);
+        el.textContent = (start < target ? Math.floor(start) : target) + suffix;
+        if (start >= target) clearInterval(timer);
+      }, step);
+    }
+
+    // ── Scroll reveal ──────────────────────────────────────────
+    const revealEls = document.querySelectorAll('.reveal');
+    const revealObs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          revealObs.unobserve(e.target);
         }
       });
-    }, { threshold: 0.15 });
+    }, { threshold: 0.12 });
+    revealEls.forEach(el => revealObs.observe(el));
 
-    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-
-    // ── Count-up ──────────────────────────────────────────────
-    const countObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const el = entry.target;
-          const target = parseInt(el.dataset.target, 10);
-          const duration = 1600;
-          const start = performance.now();
-          function tick(now) {
-            const elapsed = now - start;
-            const progress = Math.min(elapsed / duration, 1);
-            const eased = 1 - Math.pow(1 - progress, 3);
-            el.textContent = Math.round(eased * target);
-            if (progress < 1) requestAnimationFrame(tick);
-          }
-          requestAnimationFrame(tick);
-          countObserver.unobserve(el);
+    // Count-up when hero stats become visible
+    const statNums = document.querySelectorAll('.hero-stat-num');
+    const statObs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          statNums.forEach(el => {
+            countUp(el, parseInt(el.dataset.target), el.dataset.suffix || '');
+          });
+          statObs.disconnect();
         }
       });
     }, { threshold: 0.5 });
+    statObs.observe(document.getElementById('hero-stats'));
 
-    document.querySelectorAll('.count').forEach(el => countObserver.observe(el));
+    // ── Hamburger ──────────────────────────────────────────────
+    document.getElementById('nav-hamburger').addEventListener('click', () => {
+      document.getElementById('nav-links').classList.toggle('open');
+    });
 
-    // ── Score ring animation ───────────────────────────────────
-    let scoreAnimated = false;
-    function animateScoreRing() {
-      if (scoreAnimated) return;
-      scoreAnimated = true;
-      const arc = document.getElementById('score-arc');
-      const circumference = 314;
-      const score = 67;
-      const offset = circumference - (score / 100) * circumference;
-      arc.style.strokeDashoffset = offset;
-      // Animate metric bars
-      document.querySelectorAll('.bar-fill').forEach(bar => {
-        const w = bar.dataset.width;
-        bar.style.width = w + '%';
-      });
-    }
-
-    // Also observe the audit right panel
-    const auditRight = document.getElementById('audit-right');
-    if (auditRight) {
-      const auditObs = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting) animateScoreRing();
-      }, { threshold: 0.3 });
-      auditObs.observe(auditRight);
-    }
-
-    // ── Audit form ────────────────────────────────────────────
-    document.getElementById('audit-form').addEventListener('submit', e => {
+    // ── Audit form → POST /leads/ ──────────────────────────────
+    document.getElementById('audit-form').addEventListener('submit', async e => {
       e.preventDefault();
-      const btn = e.target.querySelector('button');
-      const original = btn.textContent;
-      btn.textContent = 'Request sent ✓';
-      btn.style.background = 'var(--moss)';
-      setTimeout(() => { btn.textContent = original; btn.style.background = ''; e.target.reset(); }, 3000);
+      const msg = document.getElementById('audit-msg');
+      const btn = e.target.querySelector('button[type="submit"]');
+      const cafe = document.getElementById('f-cafe').value.trim();
+      const email = document.getElementById('f-email').value.trim();
+      const ig = document.getElementById('f-ig').value.trim();
+      const city = document.getElementById('f-city').value.trim();
+
+      if (!cafe || !email) {
+        msg.textContent = 'Café name and email are required.';
+        msg.className = 'error';
+        return;
+      }
+
+      btn.textContent = 'Sending…';
+      btn.disabled = true;
+      msg.textContent = '';
+      msg.className = '';
+
+      try {
+        const res = await fetch(`${API}/leads/`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ cafe_name: cafe, email, instagram: ig || undefined, city: city || undefined })
+        });
+        if (res.status === 201 || res.ok) {
+          msg.textContent = "✓ Request received! You'll hear from us within 48 hours.";
+          msg.className = 'success';
+          e.target.reset();
+        } else {
+          const err = await res.json().catch(() => ({}));
+          msg.textContent = err.detail || 'Something went wrong. Please try again.';
+          msg.className = 'error';
+        }
+      } catch {
+        msg.textContent = 'Network error. Please check your connection.';
+        msg.className = 'error';
+      } finally {
+        btn.textContent = 'Request free audit →';
+        btn.disabled = false;
+      }
     });
   </script>
 
