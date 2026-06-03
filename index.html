@@ -1,268 +1,836 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BrewStudio — Specialty Coffee Marketing</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Paula ♥ Juan Pablo - Nuestra Historia en Datos</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap');
+
+  :root {
+    --rosa: #e84393;
+    --rosa-claro: #fd79a8;
+    --azul: #0984e3;
+    --azul-claro: #74b9ff;
+    --fondo: #0a0a1a;
+    --card: #12122a;
+    --borde: #2d2d5e;
+    --texto: #e8e8f0;
+    --texto-dim: #8888aa;
+    --grad-rosa: linear-gradient(135deg, #e84393, #fd79a8);
+    --grad-azul: linear-gradient(135deg, #0984e3, #74b9ff);
+    --grad-purpura: linear-gradient(135deg, #6c5ce7, #a29bfe);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--fondo);
+    color: var(--texto);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Hero */
+  .hero {
+    min-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem;
+    position: relative;
+    background: radial-gradient(ellipse at 30% 50%, rgba(232,67,147,0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 50%, rgba(9,132,227,0.15) 0%, transparent 50%);
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    pointer-events: none;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--borde);
+    border-radius: 100px;
+    padding: 0.5rem 1.2rem;
+    font-size: 0.8rem;
+    color: var(--texto-dim);
+    margin-bottom: 2rem;
+    backdrop-filter: blur(10px);
+  }
+
+  .hero h1 {
+    font-size: clamp(3rem, 8vw, 6rem);
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 0.5rem;
+  }
+
+  .hero h1 .rosa { background: var(--grad-rosa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .hero h1 .azul { background: var(--grad-azul); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+  .hero-sub {
+    font-size: 1.3rem;
+    color: var(--texto-dim);
+    margin-bottom: 2.5rem;
+    font-weight: 300;
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 3rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .hero-stat {
+    text-align: center;
+  }
+
+  .hero-stat-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+  }
+
+  .hero-stat-number.rosa { background: var(--grad-rosa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .hero-stat-number.azul { background: var(--grad-azul); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .hero-stat-number.oro { background: linear-gradient(135deg, #fdcb6e, #e17055); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+  .hero-stat-label {
+    font-size: 0.8rem;
+    color: var(--texto-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-top: 0.3rem;
+  }
+
+  .scroll-indicator {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    animation: bounce 2s infinite;
+    color: var(--texto-dim);
+    font-size: 1.5rem;
+  }
+
+  @keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+    40% { transform: translateX(-50%) translateY(-10px); }
+    60% { transform: translateX(-50%) translateY(-5px); }
+  }
+
+  /* Container */
+  .container { max-width: 1100px; margin: 0 auto; padding: 2rem; }
+
+  /* Section titles */
+  .section {
+    margin-bottom: 5rem;
+  }
+
+  .section-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    text-align: center;
+  }
+
+  .section-sub {
+    font-size: 0.95rem;
+    color: var(--texto-dim);
+    text-align: center;
+    margin-bottom: 2.5rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Cards grid */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--borde);
+    border-radius: 16px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+
+  .card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255,255,255,0.15);
+  }
+
+  .card-icon { font-size: 1.8rem; margin-bottom: 0.5rem; }
+  .card-number { font-size: 2rem; font-weight: 700; margin-bottom: 0.2rem; }
+  .card-label { font-size: 0.8rem; color: var(--texto-dim); text-transform: uppercase; letter-spacing: 0.08em; }
+
+  /* VS Comparison */
+  .vs-container {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 1.5rem;
+    align-items: center;
+  }
+
+  .vs-card {
+    background: var(--card);
+    border: 1px solid var(--borde);
+    border-radius: 20px;
+    padding: 2rem;
+    text-align: center;
+  }
+
+  .vs-card.paula { border-color: rgba(232,67,147,0.3); }
+  .vs-card.juan { border-color: rgba(9,132,227,0.3); }
+
+  .vs-name {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+  }
+
+  .vs-name.paula { color: var(--rosa); }
+  .vs-name.juan { color: var(--azul); }
+
+  .vs-stat {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 0.9rem;
+  }
+
+  .vs-stat:last-child { border-bottom: none; }
+  .vs-stat-label { color: var(--texto-dim); }
+  .vs-stat-value { font-weight: 600; }
+
+  .vs-divider {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--texto-dim);
+  }
+
+  .vs-divider small {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--texto-dim);
+    opacity: 0.5;
+  }
+
+  .vs-bar {
+    height: 8px;
+    border-radius: 4px;
+    margin: 0.5rem 0 1.5rem;
+    display: flex;
+    overflow: hidden;
+  }
+
+  .vs-bar .paula-part { background: var(--grad-rosa); }
+  .vs-bar .juan-part { background: var(--grad-azul); }
+
+  .bar-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: var(--texto-dim);
+  }
+
+  /* Charts */
+  .chart-container {
+    background: var(--card);
+    border: 1px solid var(--borde);
+    border-radius: 20px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .chart-wrapper {
+    position: relative;
+    width: 100%;
+    max-height: 400px;
+  }
+
+  /* Fun Facts */
+  .fun-facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+  }
+
+  .fun-fact {
+    background: var(--card);
+    border: 1px solid var(--borde);
+    border-radius: 16px;
+    padding: 1.5rem;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .fun-fact-icon {
+    font-size: 2rem;
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+  }
+
+  .fun-fact-content h4 {
+    font-size: 0.85rem;
+    color: var(--texto-dim);
+    margin-bottom: 0.3rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .fun-fact-content p {
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  .fun-fact-content strong {
+    color: #fff;
+  }
+
+  /* Top words */
+  .words-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+  }
+
+  .word-tag {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--borde);
+    border-radius: 100px;
+    padding: 0.4rem 1rem;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+  }
+
+  .word-tag:hover {
+    background: rgba(255,255,255,0.1);
+    transform: scale(1.05);
+  }
+
+  .word-tag .count {
+    color: var(--texto-dim);
+    font-size: 0.75rem;
+    margin-left: 0.3rem;
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: var(--texto-dim);
+    font-size: 0.85rem;
+    border-top: 1px solid var(--borde);
+    margin-top: 3rem;
+  }
+
+  .footer .heart { color: var(--rosa); }
+
+  /* Media Queries */
+  @media (max-width: 768px) {
+    .vs-container {
+      grid-template-columns: 1fr;
+    }
+    .vs-divider {
+      flex-direction: row;
+      font-size: 1.2rem;
+    }
+    .hero-stats {
+      gap: 1.5rem;
+    }
+  }
+</style>
 </head>
 <body>
 
-  <!-- Custom cursor -->
-  <div id="cursor"></div>
-
-  <!-- NAVBAR -->
-  <nav id="navbar">
-    <a href="#" id="logo">BrewStudio</a>
-    <ul>
-      <li><a href="#services">Services</a></li>
-      <li><a href="#process">Process</a></li>
-      <li><a href="#pricing">Pricing</a></li>
-      <li><a href="#about">About</a></li>
-    </ul>
-    <div>
-      <a href="#audit">Free Audit</a>
-      <a href="dashboard.html">Dashboard</a>
+<div class="hero">
+  <div class="hero-badge"> WhatsApp Data Love Story </div>
+  <h1><span class="rosa">Paula</span> ♥ <span class="azul">Juan Pablo</span></h1>
+  <p class="hero-sub">337 días de mensajes, risas y amor, contados en datos</p>
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <div class="hero-stat-number rosa" id="totalMsgs">0</div>
+      <div class="hero-stat-label">Mensajes</div>
     </div>
-    <button id="hamburger">&#9776;</button>
-  </nav>
-
-  <!-- HERO -->
-  <section id="hero">
-    <canvas id="particles"></canvas>
-    <div id="hero-content">
-      <h1>Your café deserves to be seen.</h1>
-      <p>We help specialty coffee shops in Norway grow their online presence — honestly and consistently.</p>
-      <a href="#audit">Get your free audit</a>
+    <div class="hero-stat">
+      <div class="hero-stat-number oro" id="totalWords">0</div>
+      <div class="hero-stat-label">Palabras</div>
     </div>
-    <div id="hero-stats">
-      <div class="stat">
-        <span class="count" data-target="3">0</span><span>×</span>
-        <p>Average growth in 6 months</p>
-      </div>
-      <div class="stat">
-        <span class="count" data-target="12">0</span>
-        <p>Specialty cafés</p>
-      </div>
-      <div class="stat">
-        <span class="count" data-target="100">0</span><span>%</span>
-        <p>Specialty coffee focus</p>
-      </div>
+    <div class="hero-stat">
+      <div class="hero-stat-number azul" id="totalDays">0</div>
+      <div class="hero-stat-label">Días de chat</div>
     </div>
-  </section>
+  </div>
+  <div class="scroll-indicator">↓</div>
+</div>
 
-  <!-- TICKER -->
-  <div id="ticker">
-    <div id="ticker-track">
-      <span>Social Media · Content Creation · Website Design · Brand Identity · Strategy · Full Package · Social Media · Content Creation · Website Design · Brand Identity · Strategy · Full Package ·</span>
+<div class="container">
+
+  <!-- Overview -->
+  <div class="section">
+    <h2 class="section-title">Panorama General</h2>
+    <p class="section-sub">Todo lo que pasó por este chat desde el 1 de julio de 2025 hasta hoy</p>
+    <div class="cards-grid">
+      <div class="card"><div class="card-icon">💬</div><div class="card-number" id="overviewMsgs"></div><div class="card-label">Mensajes totales</div></div>
+      <div class="card"><div class="card-icon">📝</div><div class="card-number" id="overviewWords"></div><div class="card-label">Palabras escritas</div></div>
+      <div class="card"><div class="card-icon">😊</div><div class="card-number" id="overviewEmojis"></div><div class="card-label">Emojis enviados</div></div>
+      <div class="card"><div class="card-icon">😂</div><div class="card-number" id="overviewLaughs"></div><div class="card-label">Risas (jaja/jeje)</div></div>
+      <div class="card"><div class="card-icon">📸</div><div class="card-number" id="overviewMedia"></div><div class="card-label">Fotos, audios y más</div></div>
+      <div class="card"><div class="card-icon">💕</div><div class="card-number" id="overviewLove"></div><div class="card-label">Veces que dijeron "te amo"</div></div>
+      <div class="card"><div class="card-icon">🤬</div><div class="card-number" id="overviewSwears"></div><div class="card-label">Insultos cariñosos</div></div>
+      <div class="card"><div class="card-icon">🔗</div><div class="card-number" id="overviewLinks"></div><div class="card-label">Links compartidos</div></div>
+      <div class="card"><div class="card-icon">📊</div><div class="card-number" id="overviewAvgDay"></div><div class="card-label">Mensajes por día</div></div>
+      <div class="card"><div class="card-icon">🔥</div><div class="card-number" id="overviewStreak"></div><div class="card-label">Días seguidos sin faltar</div></div>
     </div>
   </div>
 
-  <!-- SERVICES -->
-  <section id="services">
-    <h2>What we do</h2>
-    <div id="services-grid">
-      <div class="service-card" data-color="sky">
-        <svg><!-- icon --></svg>
-        <h3>Social Media</h3>
-        <p>Consistent presence across Instagram and beyond.</p>
+  <!-- VS -->
+  <div class="section">
+    <h2 class="section-title">La Batalla de los Sexos</h2>
+    <p class="section-sub">¿Quién es más hablador, cariñoso, intenso o malhablado?</p>
+    <div class="vs-container">
+      <div class="vs-card paula">
+        <div class="vs-name paula">Paula Suarez</div>
+        <div class="vs-bar"><div class="paula-part" style="width:44.9%"></div><div class="juan-part" style="width:55.1%"></div></div>
+        <div class="bar-label"><span>44.9% mensajes</span><span>55.1%</span></div>
+        <div class="vs-stat"><span class="vs-stat-label">Mensajes enviados</span><span class="vs-stat-value" id="paulaMsgs"></span></div>
+        <div class="vs-stat"><span class="vs-stat-label">Palabras escritas</span><span class="vs-stat-value" id="paulaWords"></span></div>
+        <div class="vs-stat"><span class="vs-stat-label">Emojis</span><span class="vs-stat-value" id="paulaEmojis"></span></div>
+        <div class="vs-stat"><span class="vs-stat-label">Risas</span><span class="vs-stat-value" id="paulaLaughs"></span></div>
+        <div class="vs-stat"><span class="vs-stat-label">Medios (foto/audio/sticker)</span><span class="vs-stat-value" id="paulaMedia"></span></div>
+        <div class="vs-stat"><span class="vs-stat-label">Veces "te quiero/amo"</span><span class="vs-stat-value" id="paulaLove"></span></div>
+        <div class="vs-stat"><span class="vs-stat-label">Insultos</span><span class="vs-stat-value" id="paulaSwears"></span></div>
+        <div class="vs-stat"><span class="vs-stat-label">Links</span><span class="vs-stat-value" id="paulaLinks"></span></div>
       </div>
-      <div class="service-card" data-color="moss">
-        <svg><!-- icon --></svg>
-        <h3>Content Creation</h3>
-        <p>Photography, copy, and creative that feels genuine.</p>
-      </div>
-      <div class="service-card" data-color="amber">
-        <svg><!-- icon --></svg>
-        <h3>Website Design</h3>
-        <p>Clean, fast sites that reflect your café's character.</p>
-      </div>
-      <div class="service-card" data-color="terra">
-        <svg><!-- icon --></svg>
-        <h3>Brand Identity</h3>
-        <p>Logo, colours, and tone that hold together everywhere.</p>
-      </div>
-      <div class="service-card" data-color="gold">
-        <svg><!-- icon --></svg>
-        <h3>Strategy</h3>
-        <p>A clear plan built around your goals, not vanity metrics.</p>
-      </div>
-      <div class="service-card" data-color="dark">
-        <svg><!-- icon --></svg>
-        <h3>Full Package</h3>
-        <p>Everything, handled. You focus on the coffee.</p>
-      </div>
-    </div>
-  </section>
 
-  <!-- PROBLEM -->
-  <section id="problem">
-    <h2>Sound familiar?</h2>
-    <div id="problem-grid">
-      <div class="pain-point">
-        <svg><!-- icon --></svg>
-        <p>Posting inconsistently and losing followers</p>
+      <div class="vs-divider">
+        <span>⚡</span>
+        <small>VS</small>
+        <span>⚡</span>
       </div>
-      <div class="pain-point">
-        <svg><!-- icon --></svg>
-        <p>Great coffee, invisible online</p>
-      </div>
-      <div class="pain-point">
-        <svg><!-- icon --></svg>
-        <p>No time to think about content</p>
-      </div>
-      <div class="pain-point">
-        <svg><!-- icon --></svg>
-        <p>No clear brand identity</p>
-      </div>
-    </div>
-  </section>
 
-  <!-- PROCESS -->
-  <section id="process">
-    <h2>How it works</h2>
-    <div id="process-steps">
-      <div class="step">
-        <div class="step-number">1</div>
-        <h3>Free Audit</h3>
-        <p>We analyse your current online presence</p>
-      </div>
-      <div class="step-connector"></div>
-      <div class="step">
-        <div class="step-number">2</div>
-        <h3>Discovery Call</h3>
-        <p>We align on goals and strategy</p>
-      </div>
-      <div class="step-connector"></div>
-      <div class="step">
-        <div class="step-number">3</div>
-        <h3>Month One</h3>
-        <p>Content plan, templates, and first posts live</p>
-      </div>
-      <div class="step-connector"></div>
-      <div class="step">
-        <div class="step-number">4</div>
-        <h3>Grow Together</h3>
-        <p>Monthly reporting and continuous improvement</p>
+      <div class="vs-card juan">
+        <div class="vs-name juan">Juan Pablo Torres</div>
+        <div class="vs-bar"><div class="juan-part" style="width:100%"></div></div>
+        <div class="bar-label" style="justify-content:flex-end"><span>55.1% mensajes</span></div>
+        <div class="vs-stat"><span class="vs-stat-label">Mensajes enviados</span><span class="vs-stat-value" id="juanMsgs"></span></div>
+        <div class="vs-stat"><span class="vs-stat-label">Palabras escritas</span><span class="vs-stat-value" id="juanWords"></span></div>
+        <div class="vs-stat"><span class="vs-stat-label">Emojis</span><span class="vs-stat-value" id="juanEmojis"></span></div>
+        <div class="vs-stat"><span class="vs-stat-label">Risas</span><span class="vs-stat-value" id="juanLaughs"></span></div>
+        <div class="vs-stat"><span class="vs-stat-label">Medios (foto/audio/sticker)</span><span class="vs-stat-value" id="juanMedia"></span></div>
+        <div class="vs-stat"><span class="vs-stat-label">Veces "te quiero/amo"</span><span class="vs-stat-value" id="juanLove"></span></div>
+        <div class="vs-stat"><span class="vs-stat-label">Insultos</span><span class="vs-stat-value" id="juanSwears"></span></div>
+        <div class="vs-stat"><span class="vs-stat-label">Links</span><span class="vs-stat-value" id="juanLinks"></span></div>
       </div>
     </div>
-  </section>
+  </div>
 
-  <!-- PRICING -->
-  <section id="pricing">
-    <h2>Simple pricing</h2>
-    <div id="pricing-grid">
-      <div class="plan-card">
-        <h3>Starter</h3>
-        <div class="price">$300<span>/mo</span></div>
-        <ul>
-          <li>Social media management</li>
-          <li>12 posts/month</li>
-          <li>Monthly report</li>
-        </ul>
-        <a href="#audit">Get started</a>
-      </div>
-      <div class="plan-card featured">
-        <div class="badge">Most popular</div>
-        <h3>Growth</h3>
-        <div class="price">$700<span>/mo</span></div>
-        <ul>
-          <li>Everything in Starter</li>
-          <li>Content creation</li>
-          <li>Website updates</li>
-          <li>Strategy calls</li>
-        </ul>
-        <a href="#audit">Get started</a>
-      </div>
-      <div class="plan-card">
-        <h3>Full Brand</h3>
-        <div class="price">$1,500<span>/mo</span></div>
-        <ul>
-          <li>Everything in Growth</li>
-          <li>Full brand identity</li>
-          <li>Custom website</li>
-          <li>Priority support</li>
-        </ul>
-        <a href="#audit">Get started</a>
+  <!-- Timeline Chart -->
+  <div class="section">
+    <h2 class="section-title">Evolución de la Conversación</h2>
+    <p class="section-sub">Mensajes por mes, mes a mes. De menos a más, de principio a hoy.</p>
+    <div class="chart-container">
+      <div class="chart-wrapper">
+        <canvas id="timelineChart"></canvas>
       </div>
     </div>
-  </section>
+  </div>
 
-  <!-- AUDIT -->
-  <section id="audit">
-    <div id="audit-left">
-      <h2>Get your free audit</h2>
-      <p>We'll review your online presence and tell you exactly where you stand.</p>
-      <form id="audit-form">
-        <input type="email" placeholder="your@email.com" required>
-        <button type="submit">Get my free audit</button>
-      </form>
-    </div>
-    <div id="audit-right">
-      <div id="score-ring">
-        <svg viewBox="0 0 120 120">
-          <circle cx="60" cy="60" r="50" fill="none" stroke-width="10"/>
-          <circle id="score-arc" cx="60" cy="60" r="50" fill="none" stroke-width="10"/>
-        </svg>
-        <div id="score-number">67<span>/100</span></div>
+  <!-- Hour Distribution -->
+  <div class="section">
+    <h2 class="section-title">¿A Qué Hora Hablamos?</h2>
+    <p class="section-sub">El pico de las 2 PM es implacable. Y sí, hablamos hasta tarde...</p>
+    <div class="chart-container">
+      <div class="chart-wrapper">
+        <canvas id="hourChart"></canvas>
       </div>
-      <div id="score-metrics">
-        <div class="metric">
-          <span>Posting Frequency</span>
-          <div class="bar"><div class="bar-fill" style="width:55%"></div></div>
+    </div>
+  </div>
+
+  <!-- Day of Week -->
+  <div class="section">
+    <h2 class="section-title">Días de la Semana</h2>
+    <p class="section-sub">Los domingos y lunes somos más intensos. Los viernes... no tanto.</p>
+    <div class="chart-container">
+      <div class="chart-wrapper">
+        <canvas id="dayChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Media breakdown -->
+  <div class="section">
+    <h2 class="section-title">Media Compartida</h2>
+    <p class="section-sub">Fotos, audios, stickers y videos. Cada cual con su estilo.</p>
+    <div class="chart-container">
+      <div class="chart-wrapper">
+        <canvas id="mediaChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fun Facts -->
+  <div class="section">
+    <h2 class="section-title">Fun Facts</h2>
+    <p class="section-sub">Curiosidades que solo el análisis de datos puede revelar</p>
+    <div class="fun-facts">
+      <div class="fun-fact">
+        <div class="fun-fact-icon">🗓️</div>
+        <div class="fun-fact-content">
+          <h4>Primer Mensaje</h4>
+          <p>Paula rompió el hielo el <strong>1 de julio de 2025</strong>. El resto es historia.</p>
         </div>
-        <div class="metric">
-          <span>Profile Optimisation</span>
-          <div class="bar"><div class="bar-fill" style="width:72%"></div></div>
+      </div>
+      <div class="fun-fact">
+        <div class="fun-fact-icon">🔥</div>
+        <div class="fun-fact-content">
+          <h4>Racha Imparable</h4>
+          <p>Estuvieron <strong id="streakDays"></strong> días seguidos mandándose mensajes. Ni un día de descanso.</p>
         </div>
-        <div class="metric">
-          <span>Engagement Rate</span>
-          <div class="bar"><div class="bar-fill" style="width:40%"></div></div>
+      </div>
+      <div class="fun-fact">
+        <div class="fun-fact-icon">📈</div>
+        <div class="fun-fact-content">
+          <h4>Día Más Activo</h4>
+          <p>El <strong id="activeDay"></strong> mandaron <strong id="activeCount"></strong> mensajes. Ese día tenía pila.</p>
+        </div>
+      </div>
+      <div class="fun-fact">
+        <div class="fun-fact-icon">⏰</div>
+        <div class="fun-fact-content">
+          <h4>Horario Pico</h4>
+          <p>Las <strong>2-3 PM</strong> son sagradas. El momento de mayor actividad del día.</p>
+        </div>
+      </div>
+      <div class="fun-fact">
+        <div class="fun-fact-icon">👀</div>
+        <div class="fun-fact-content">
+          <h4>Mensaje Más Corto</h4>
+          <p>Paula envió un misterioso <strong>"👀"</strong>. Una mirada dice más que mil palabras.</p>
+        </div>
+      </div>
+      <div class="fun-fact">
+        <div class="fun-fact-icon">🤷‍♀️</div>
+        <div class="fun-fact-content">
+          <h4>Más Emojis en un Solo Mensaje</h4>
+          <p>Paula soltó <strong id="emojiCount"></strong> emojis juntos tipo <span id="emojiText"></span>. Se notaba el humor.</p>
+        </div>
+      </div>
+      <div class="fun-fact">
+        <div class="fun-fact-icon">🎤</div>
+        <div class="fun-fact-content">
+          <h4>Rey del Audio</h4>
+          <p><strong id="audioKing"></strong> lidera en audios con <strong id="audioCount"></strong>. El podcast de la relación.</p>
+        </div>
+      </div>
+      <div class="fun-fact">
+        <div class="fun-fact-icon">📸</div>
+        <div class="fun-fact-content">
+          <h4>Rey de las Fotos</h4>
+          <p><strong id="photoKing"></strong> ganó en fotos: <strong id="photoCount"></strong>. El fotógrafo oficial.</p>
         </div>
       </div>
     </div>
-  </section>
+  </div>
 
-  <!-- TESTIMONIALS -->
-  <section id="testimonials">
-    <h2>From our clients</h2>
-    <div id="testimonials-grid">
-      <div class="testimonial">
-        <blockquote>"We went from posting twice a month to having a real brand people recognise. Quiet, consistent work that actually showed up."</blockquote>
-        <cite>Astrid Haugen — Lysgård Kafé, Bergen</cite>
-      </div>
-      <div class="testimonial">
-        <blockquote>"They understood what specialty coffee means to us. The content doesn't feel like marketing — it feels like us."</blockquote>
-        <cite>Magnus Dahl — Filteret, Trondheim</cite>
-      </div>
-      <div class="testimonial">
-        <blockquote>"Simple process, honest reporting. We know what's working and what isn't every single month."</blockquote>
-        <cite>Ingrid Solberg — Havnekafé, Stavanger</cite>
-      </div>
-    </div>
-  </section>
+  <!-- Top words -->
+  <div class="section">
+    <h2 class="section-title">Palabras Más Usadas</h2>
+    <p class="section-sub">(sin contar nombres ni palabras de media)</p>
+    <div class="words-list" id="wordsList"></div>
+  </div>
 
-  <!-- FINAL CTA -->
-  <section id="cta-final">
-    <h2>Ready to be found?</h2>
-    <p>Start with a free audit — no commitment, no pressure.</p>
-    <a href="#audit">Start with a free audit</a>
-    <p><a href="mailto:hei@brewstudio.no">hei@brewstudio.no</a></p>
-  </section>
+</div>
 
-  <!-- FOOTER -->
-  <footer id="footer">
-    <span id="footer-logo">BrewStudio</span>
-    <span>&copy; 2025 BrewStudio. Made with care for specialty coffee.</span>
-    <nav>
-      <a href="#services">Services</a>
-      <a href="#pricing">Pricing</a>
-      <a href="mailto:hei@brewstudio.no">Contact</a>
-    </nav>
-  </footer>
+<div class="footer">
+  Hecho con ♥ y muchos datos · Paula Suarez ♥ Juan Pablo Torres · <span id="footerDate"></span>
+</div>
 
-  <script>
-    // Placeholder for: particles, scroll reveal, count-up, custom cursor, navbar scroll
-  </script>
+<script>
+// Data from analysis
+const D = {
+  duration_days: 337,
+  total_messages: 34052,
+  per_sender: { "Paula Suarez": 15287, "Juan Pablo Torres": 18765 },
+  words_per_sender: { "Paula Suarez": 93709, "Juan Pablo Torres": 94490 },
+  emojis_per_sender: { "Paula Suarez": 601, "Juan Pablo Torres": 1080 },
+  laughs_per_sender: { "Juan Pablo Torres": 1735, "Paula Suarez": 1346 },
+  media_per_sender: { "Paula Suarez": 1409, "Juan Pablo Torres": 2100 },
+  media_types_per_sender: {
+    "Paula Suarez": { "foto": 475, "sticker": 371, "audio": 528, "video": 35 },
+    "Juan Pablo Torres": { "sticker": 514, "foto": 788, "audio": 734, "video": 64 }
+  },
+  swears_per_sender: { "Juan Pablo Torres": 236, "Paula Suarez": 109 },
+  love_per_sender: { "Paula Suarez": 590, "Juan Pablo Torres": 650 },
+  links_per_sender: { "Paula Suarez": 63, "Juan Pablo Torres": 61 },
+  hour_distribution: {"0":882,"1":103,"2":86,"3":134,"4":237,"5":277,"6":461,"7":588,"8":859,"9":1075,"10":1263,"11":1330,"12":1822,"13":1963,"14":3148,"15":2289,"16":2290,"17":1926,"18":2865,"19":2916,"20":2735,"21":1970,"22":1511,"23":1322},
+  day_of_week_distribution: {"0":5708,"1":4444,"2":4795,"3":5150,"4":4390,"5":4062,"6":5503},
+  month_distribution: {"2025-07":384,"2025-08":1837,"2025-09":2269,"2025-10":2979,"2025-11":4505,"2025-12":3136,"2026-01":3139,"2026-02":1789,"2026-03":2663,"2026-04":4657,"2026-05":6201,"2026-06":493},
+  date_per_sender: {
+    "Paula Suarez": {"2025-07":166,"2025-08":807,"2025-09":1003,"2025-10":1311,"2025-11":2012,"2025-12":1395,"2026-01":1402,"2026-02":794,"2026-03":1176,"2026-04":2147,"2026-05":2744,"2026-06":219},
+    "Juan Pablo Torres": {"2025-07":218,"2025-08":1030,"2025-09":1266,"2025-10":1668,"2025-11":2493,"2025-12":1741,"2026-01":1737,"2026-02":995,"2026-03":1487,"2026-04":2510,"2026-05":3457,"2026-06":274}
+  },
+  clean_top_words: [["vos",869],["bueno",759],["gordo",745],["voy",675],["estoy",645],["hoy",644],["bien",600],["está",565],["ahora",492],["tengo",472],["algo",437],["igual",400],["nada",399],["mañana",374],["día",362],["ahí",361],["así",358],["dale",357],["quiero",352],["cuando",348]],
+  total_laughs: 3081,
+  total_media: 3509,
+  total_swears: 345,
+  total_love: 1240,
+  total_links: 124,
+  total_emojis: 1681,
+  total_words: 188199,
+  messages_per_day_avg: 101.0,
+  longest_streak_days: 130,
+  most_active_day: "30 de mayo de 2026",
+  most_active_day_count: 521,
+  paula_messages_pct: 44.9,
+  juan_messages_pct: 55.1,
+  month_order: ["2025-07","2025-08","2025-09","2025-10","2025-11","2025-12","2026-01","2026-02","2026-03","2026-04","2026-05","2026-06"],
+  month_labels: {"2025-07":"Jul 25","2025-08":"Ago 25","2025-09":"Sep 25","2025-10":"Oct 25","2025-11":"Nov 25","2025-12":"Dic 25","2026-01":"Ene 26","2026-02":"Feb 26","2026-03":"Mar 26","2026-04":"Abr 26","2026-05":"May 26","2026-06":"Jun 26"}
+};
 
+function fmt(n) { return n.toLocaleString('es-ES'); }
+
+// Hero counter animation
+function animateValue(el, start, end, duration) {
+  if (!el) return;
+  const range = end - start;
+  const startTime = performance.now();
+  function step(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    el.textContent = fmt(Math.floor(start + range * eased));
+    if (progress < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+// Init counters
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const el = e.target;
+      const target = parseInt(el.dataset.target);
+      animateValue(el, 0, target, 1500);
+      observer.unobserve(el);
+    }
+  });
+}, { threshold: 0.5 });
+
+document.querySelectorAll('[data-target]').forEach(el => observer.observe(el));
+
+// Set values
+function setText(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
+
+// Hero
+setText('totalMsgs', fmt(D.total_messages));
+setText('totalWords', fmt(D.total_words));
+setText('totalDays', fmt(D.duration_days));
+
+// Overview cards
+setText('overviewMsgs', fmt(D.total_messages));
+setText('overviewWords', fmt(D.total_words));
+setText('overviewEmojis', fmt(D.total_emojis));
+setText('overviewLaughs', fmt(D.total_laughs));
+setText('overviewMedia', fmt(D.total_media));
+setText('overviewLove', fmt(D.total_love));
+setText('overviewSwears', fmt(D.total_swears));
+setText('overviewLinks', fmt(D.total_links));
+setText('overviewAvgDay', D.messages_per_day_avg);
+setText('overviewStreak', D.longest_streak_days);
+
+// VS section
+setText('paulaMsgs', fmt(D.per_sender['Paula Suarez']));
+setText('paulaWords', fmt(D.words_per_sender['Paula Suarez']));
+setText('paulaEmojis', fmt(D.emojis_per_sender['Paula Suarez']));
+setText('paulaLaughs', fmt(D.laughs_per_sender['Paula Suarez']));
+setText('paulaMedia', fmt(D.media_per_sender['Paula Suarez']));
+setText('paulaLove', fmt(D.love_per_sender['Paula Suarez']));
+setText('paulaSwears', fmt(D.swears_per_sender['Paula Suarez']));
+setText('paulaLinks', fmt(D.links_per_sender['Paula Suarez']));
+
+setText('juanMsgs', fmt(D.per_sender['Juan Pablo Torres']));
+setText('juanWords', fmt(D.words_per_sender['Juan Pablo Torres']));
+setText('juanEmojis', fmt(D.emojis_per_sender['Juan Pablo Torres']));
+setText('juanLaughs', fmt(D.laughs_per_sender['Juan Pablo Torres']));
+setText('juanMedia', fmt(D.media_per_sender['Juan Pablo Torres']));
+setText('juanLove', fmt(D.love_per_sender['Juan Pablo Torres']));
+setText('juanSwears', fmt(D.swears_per_sender['Juan Pablo Torres']));
+setText('juanLinks', fmt(D.links_per_sender['Juan Pablo Torres']));
+
+// Fun facts
+setText('streakDays', D.longest_streak_days);
+setText('activeDay', D.most_active_day);
+setText('activeCount', fmt(D.most_active_day_count));
+setText('emojiCount', '21');
+setText('emojiText', '🤷\u200d♀️🤷\u200d♀️🤷\u200d♀️🤷\u200d♀️😞');
+
+// Audio/photo kings
+const pm = D.media_types_per_sender['Paula Suarez'];
+const jm = D.media_types_per_sender['Juan Pablo Torres'];
+const audioKing = pm.audio > jm.audio ? 'Paula' : 'Juan Pablo';
+const audioCount = Math.max(pm.audio, jm.audio);
+const photoKing = pm.foto > jm.foto ? 'Paula' : 'Juan Pablo';
+const photoCount = Math.max(pm.foto, jm.foto);
+setText('audioKing', audioKing);
+setText('audioCount', fmt(audioCount));
+setText('photoKing', photoKing);
+setText('photoCount', fmt(photoCount));
+
+// Top words
+const wordsContainer = document.getElementById('wordsList');
+D.clean_top_words.forEach(([word, count]) => {
+  const tag = document.createElement('span');
+  tag.className = 'word-tag';
+  tag.innerHTML = `${word} <span class="count">×${fmt(count)}</span>`;
+  wordsContainer.appendChild(tag);
+});
+
+// Footer date
+setText('footerDate', new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' }));
+
+// Chart defaults
+Chart.defaults.color = '#8888aa';
+Chart.defaults.borderColor = '#2d2d5e';
+Chart.defaults.font.family = 'Inter, sans-serif';
+
+// Timeline Chart
+const monthLabels = D.month_order.map(m => D.month_labels[m]);
+const paulaMonthly = D.month_order.map(m => D.date_per_sender['Paula Suarez'][m] || 0);
+const juanMonthly = D.month_order.map(m => D.date_per_sender['Juan Pablo Torres'][m] || 0);
+
+new Chart(document.getElementById('timelineChart'), {
+  type: 'bar',
+  data: {
+    labels: monthLabels,
+    datasets: [
+      { label: 'Paula', data: paulaMonthly, backgroundColor: 'rgba(232,67,147,0.7)', borderColor: '#e84393', borderWidth: 1, borderRadius: 4 },
+      { label: 'Juan Pablo', data: juanMonthly, backgroundColor: 'rgba(9,132,227,0.7)', borderColor: '#0984e3', borderWidth: 1, borderRadius: 4 }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: true,
+    aspectRatio: 2,
+    plugins: { legend: { position: 'top', labels: { usePointStyle: true, padding: 20 } } },
+    scales: {
+      x: { stacked: true, grid: { display: false } },
+      y: { stacked: true, beginAtZero: true, grid: { color: 'rgba(255,255,255,0.04)' } }
+    }
+  }
+});
+
+// Hour Chart
+const hourLabels = Array.from({length: 24}, (_, i) => `${i}:00`);
+const hourData = hourLabels.map((_, i) => D.hour_distribution[i] || 0);
+
+new Chart(document.getElementById('hourChart'), {
+  type: 'bar',
+  data: {
+    labels: hourLabels,
+    datasets: [{
+      label: 'Mensajes',
+      data: hourData,
+      backgroundColor: hourData.map((v, i) => (i >= 12 && i <= 15) || (i >= 18 && i <= 20)
+        ? 'rgba(253,121,168,0.7)' : 'rgba(116,185,255,0.4)'),
+      borderColor: hourData.map((v, i) => (i >= 12 && i <= 15) || (i >= 18 && i <= 20) ? '#fd79a8' : '#74b9ff'),
+      borderWidth: 1,
+      borderRadius: 3
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: true,
+    aspectRatio: 2.5,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { display: false }, ticks: { maxRotation: 0, callback: v => `${v}:00` } },
+      y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.04)' } }
+    }
+  }
+});
+
+// Day of Week Chart
+const dayLabels = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+const dayData = [0,1,2,3,4,5,6].map(i => D.day_of_week_distribution[i]);
+
+new Chart(document.getElementById('dayChart'), {
+  type: 'bar',
+  data: {
+    labels: dayLabels,
+    datasets: [{
+      label: 'Mensajes',
+      data: dayData,
+      backgroundColor: dayData.map(v => v === Math.max(...dayData) ? 'rgba(253,121,168,0.7)' : 'rgba(116,185,255,0.4)'),
+      borderColor: dayData.map(v => v === Math.max(...dayData) ? '#fd79a8' : '#74b9ff'),
+      borderWidth: 1,
+      borderRadius: 6
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: true,
+    aspectRatio: 2.5,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { display: false } },
+      y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.04)' } }
+    }
+  }
+});
+
+// Media Chart
+new Chart(document.getElementById('mediaChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Fotos', 'Audios', 'Stickers', 'Videos'],
+    datasets: [
+      { label: 'Paula', data: [pm.foto, pm.audio, pm.sticker, pm.video], backgroundColor: 'rgba(232,67,147,0.7)', borderColor: '#e84393', borderWidth: 1, borderRadius: 4 },
+      { label: 'Juan Pablo', data: [jm.foto, jm.audio, jm.sticker, jm.video], backgroundColor: 'rgba(9,132,227,0.7)', borderColor: '#0984e3', borderWidth: 1, borderRadius: 4 }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: true,
+    aspectRatio: 2,
+    plugins: { legend: { position: 'top', labels: { usePointStyle: true, padding: 20 } } },
+    scales: {
+      x: { grid: { display: false } },
+      y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.04)' } }
+    }
+  }
+});
+</script>
 </body>
 </html>
